@@ -1,0 +1,14 @@
+1 - FrontRight Drive
+2 - FrontLeft Drive
+3 - BackLeft Drive
+4 - BackRight Drive
+5 - FrontRight Angle
+6 - FrontLeft Angle
+7 - BackLeft Angle
+8 - BackRight Angle
+9 - Intake (IntakeMotor)
+10 - Intake (IntakeFollower)
+11 - WristMotor
+12 - ElbowMotor
+13 - Elevator Right (ElevatorMotor)
+14 - Elevator Left (ElevatorFollower)

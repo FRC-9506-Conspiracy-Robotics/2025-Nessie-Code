@@ -42,13 +42,16 @@ public final class Constants {
         public static final Distance l3Setpoint = Inches.of(40);
         public static final Distance l4Setpoint = Inches.of(54);
         public static final Distance intakeSetpoint = Inches.of(12);
-        public static final double kElevatorKp = 30;
+
+        public static final double kElevatorKp = 0;
         public static final double kElevatorKi = 0;
-        public static final double kElevatorKd = 10;
-        public static final double kElevatorkS = 0.2;
-        public static final double kElevatorkV = 21.8;
-        public static final double kElevatorkA = 0.14;
-        public static final double kElevatorkG = 0.87;
+        public static final double kElevatorKd = 0;
+
+        public static final double kElevatorkS = 3.0;
+        public static final double kElevatorkV = 0.0;
+        public static final double kElevatorkA = 0.0;
+        public static final double kElevatorkG = 0.0;
+
         public static final double kMaxVelocity = Meters.of(1).per(Second).in(MetersPerSecond);
         public static final double kMaxAccel = Meters.of(0.5).per(Second).per(Second).in(MetersPerSecondPerSecond);
         public static final int kElevatorMaxCurrent = 40;

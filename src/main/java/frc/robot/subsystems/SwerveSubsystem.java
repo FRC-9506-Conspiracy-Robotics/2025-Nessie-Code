@@ -14,18 +14,21 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.RotationTarget;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.SwerveConstants;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.math.SwerveMath;
@@ -191,6 +194,31 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.replaceSwerveModuleFeedforward(new SimpleMotorFeedforward(kS, kV, kA));
     }
 
+    public Pose2d getPose() {
+        return swerveDrive.getPose();
+    }
+
+    public Rotation2d getHeading() {
+        return getPose().getRotation();
+    }
+
+    public void resetOdometry(Pose2d intialHolonomicPose) {
+        swerveDrive.resetOdometry(intialHolonomicPose);
+    }
+
+    public SwerveDriveKinematics getKinematics() {
+        return swerveDrive.kinematics;
+    }
+
+    public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle) {
+        Translation2d scaledInputs = SwerveMath.cubeTranslation(new Translation2d(xInput, yInput));
+        return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(), scaledInputs.getY(), angle.getRadians(), getHeading().getRadians(), SwerveConstants.maxSpeed);
+    }
+
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        swerveDrive.setChassisSpeeds(chassisSpeeds);
+    }
+
     public void drive(ChassisSpeeds velocity) {
         swerveDrive.drive(velocity);
     }
@@ -204,7 +232,7 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.driveFieldOriented(velocity);
     }
 
-    public Command driveFieldOrientedCommand(Supplier<ChassisSpeeds> velocity) {
+    public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
         return run(
             () -> {
                 swerveDrive.driveFieldOriented(velocity.get());

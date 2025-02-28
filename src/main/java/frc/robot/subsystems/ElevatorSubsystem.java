@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Inches;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -124,7 +122,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return MathUtil.isNear(
             height, 
             getHeightInches(), 
-            ElevatorConstants.kElevatorTolerance.in(Inches)
+            ElevatorConstants.kElevatorTolerance
         );
     }
 

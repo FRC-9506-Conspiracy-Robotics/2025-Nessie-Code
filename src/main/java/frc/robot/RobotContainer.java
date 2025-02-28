@@ -68,8 +68,10 @@ public class RobotContainer {
         } else {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
-        mDriverController.a().onTrue(elevator.setHeight(12.0));
-        mDriverController.b().onTrue(elevator.setHeight(24.0));
+        mDriverController.a().onTrue(elevator.setHeight(3.0));
+        mDriverController.b().onTrue(elevator.setHeight(12.0));
+        mDriverController.x().onTrue(elevator.holdPosition());
+        mDriverController.y().onTrue(elevator.stopElevator());
     }
 
     public Command getAutonomousCommand() {

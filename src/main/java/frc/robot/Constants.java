@@ -53,8 +53,8 @@ public final class Constants {
         public static final double kElevatorkA = 0.0;
         public static final double kElevatorkG = 0.25;
 
-        public static final double kMaxVelocity = Meters.of(4.0).per(Second).in(MetersPerSecond);
-        public static final double kMaxAccel = Meters.of(5.0).per(Second).per(Second).in(MetersPerSecondPerSecond);
+        public static final double kMaxVelocity = 12;
+        public static final double kMaxAccel = 5;
         public static final int kElevatorMaxCurrent = 40;
         public static final double kElevatorRampRate = 0.1;
         public static final Distance kElevatorTolerance = Inches.of(1/32);

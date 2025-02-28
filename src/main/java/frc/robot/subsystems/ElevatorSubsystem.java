@@ -85,7 +85,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double getHeightInches() {
         return 
         (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
-        * (2 * Math.PI * ElevatorConstants.kSprocketPitch);
+        * (2 * Math.PI * ElevatorConstants.kSprocketPitch) / 2;
     }
 
     public double getVelocityInchesPerSecond() {
@@ -97,7 +97,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         double voltsOut = MathUtil.clamp(
             elevatorPid.calculate(getHeightInches(), height) +
             elevatorFeed.calculateWithVelocities(
-                getVelocityInchesPerSecond(),
+                elevatorPid.getSetpoint().velocity,
                 elevatorPid.getSetpoint().velocity
             ),
             -12, 12 
@@ -107,7 +107,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command setHeight(double height) {
-        return run(() -> reachHeight(height));
+        return run(() -> {
+            reachHeight(height);
+            System.out.println("Elevator is currently at " + getHeightInches());
+            System.out.println("Velocity SP is " + elevatorPid.getSetpoint().velocity);
+        });
     }
 
     public void stop() {
@@ -134,6 +138,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                 elevatorPid.reset(holdPoint);
             },
             () -> {
+                System.out.println("Trying to hold at " + holdPoint);
+                System.out.println("Elevator is at " + getHeightInches());
                 reachHeight(holdPoint);
             }
         );

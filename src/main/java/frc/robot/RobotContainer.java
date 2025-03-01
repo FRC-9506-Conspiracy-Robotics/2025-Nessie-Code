@@ -74,7 +74,7 @@ public class RobotContainer {
         }
 
         mDriverController.povUp().onTrue(elevator.goUpOneFloor());
-        mDriverController.povDown().onTrue(elevator.goDownOneFloor());
+        mDriverController.povDown().onTrue(elevator.goDownOneFloor());      
         mDriverController.x().onTrue(elevator.holdPosition());
         mDriverController.y().onTrue(elevator.stopElevator());
         limitTrigger.onTrue(elevator.stopElevator());

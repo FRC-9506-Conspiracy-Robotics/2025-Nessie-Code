@@ -122,7 +122,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command stopElevator() {
-        return run(() -> stop());
+        return run(() -> {
+            stop();
+            System.out.println("Stopping.");
+        });
     }
 
     public boolean aroundHeight(double height, double tolerance) {
@@ -154,6 +157,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 currentFloor++;
             }
             reachHeight(floorHeights[currentFloor]);
+            System.out.println("Going up.");
         });
     }
 
@@ -163,6 +167,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 currentFloor--;
             }
             reachHeight(floorHeights[currentFloor]);
+            System.out.println("Going down.");
         });
     }
 }

@@ -3,15 +3,18 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -19,12 +22,16 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriverConstants;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+    private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+    private final DigitalInput limitswitch = new DigitalInput(0);
+    private final Trigger limitTrigger = new Trigger(limitswitch::get);
     private final ElbowSubsystem elbow = new ElbowSubsystem();
 
     //converts controller inputs to swerveinputstream type for field oriented
@@ -67,11 +74,12 @@ public class RobotContainer {
         } else {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
-        mDriverController.a().onTrue(elbow.setElbowAngle(30));
-        mDriverController.b().onTrue(elbow.setElbowAngle(60));
-        mDriverController.x().onTrue(elbow.stopElbow());
-        mDriverController.y().onTrue(elbow.holdElbow());
-        mDriverController.rightBumper().onTrue(elbow.resetZero());
+
+        mDriverController.povUp().onTrue(elevator.goUpOneFloor());
+        mDriverController.povDown().onTrue(elevator.goDownOneFloor());      
+        mDriverController.x().onTrue(elevator.holdPosition());
+        mDriverController.y().onTrue(elevator.stopElevator());
+        limitTrigger.onTrue(elevator.stopElevator());
     }
 
     public Command getAutonomousCommand() {

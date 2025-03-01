@@ -27,8 +27,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final SparkMax elevatorFollower = new SparkMax(CanId.elevatorFollowerCan, MotorType.kBrushless);
     private int currentFloor = 0;
     private final int bottomFloor = 0;
-    private final int topFloor = 4;
-    private final double[] floorHeights = {0.0, 3.0, 12.0, 15.0, 18.0};
+    private final int topFloor = 3;
+    private final double[] floorHeights = {0.0, ElevatorConstants.l2Setpoint, ElevatorConstants.l3Setpoint, ElevatorConstants.l4Setpoint};
 
     //intitalize relative encoder based on the main motor
     private final RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
@@ -124,7 +124,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command stopElevator() {
         return run(() -> {
             stop();
-            System.out.println("Stopping.");
         });
     }
 
@@ -137,37 +136,45 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private double holdPoint = 0;
-    public Command holdPosition() {
+    public Command holdPosition(boolean holdCurrentPosition) {
         return startRun(
             () -> {
-                holdPoint = getHeightInches();
-                elevatorPid.reset(holdPoint);
+                if (holdCurrentPosition) {
+                    holdPoint = getHeightInches();
+                    elevatorPid.reset(holdPoint);
+                } else {
+                    holdPoint = floorHeights[currentFloor];
+                }
+                System.out.println("Holding at " + holdPoint);
             },
             () -> {
                 reachHeight(holdPoint);
-                System.out.println("Holding: " + holdPoint);
-                System.out.println("Elevator Position: " + getHeightInches());
+                var velSP = elevatorPid.getSetpoint().velocity;
+                if (Math.abs(velSP) > 0.0) {
+                    System.out.println("Holding: " + holdPoint);
+                    System.out.println("Elevator Position: " + getHeightInches());
+                    System.out.println("Velocity SP is " + elevatorPid.getSetpoint().velocity);
+                }
+                
             }
         );
     }
 
     public Command goUpOneFloor() {
-        return run(() -> {
+        return runOnce(() -> {
             if (currentFloor < topFloor) {
                 currentFloor++;
             }
-            reachHeight(floorHeights[currentFloor]);
-            System.out.println("Going up.");
+            System.out.println("going up");
         });
     }
 
     public Command goDownOneFloor() {
-        return run(() -> {
+        return runOnce(() -> {
             if (currentFloor > bottomFloor) {
                 currentFloor--;
             }
-            reachHeight(floorHeights[currentFloor]);
-            System.out.println("Going down.");
+            System.out.println("Going down");
         });
     }
 }

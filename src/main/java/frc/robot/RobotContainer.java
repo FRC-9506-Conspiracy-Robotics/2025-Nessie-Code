@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,12 +19,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriverConstants;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+    private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -65,6 +68,10 @@ public class RobotContainer {
         } else {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
+        mDriverController.a().onTrue(elevator.setHeight(3.0));
+        mDriverController.b().onTrue(elevator.setHeight(12.0));
+        mDriverController.x().onTrue(elevator.holdPosition());
+        mDriverController.y().onTrue(elevator.stopElevator());
     }
 
     public Command getAutonomousCommand() {

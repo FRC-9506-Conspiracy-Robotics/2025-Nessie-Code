@@ -72,8 +72,9 @@ public class RobotContainer {
         } else {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
-        mDriverController.a().onTrue(elevator.setHeight(3.0));
-        mDriverController.b().onTrue(elevator.setHeight(12.0));
+
+        mDriverController.povUp().onTrue(elevator.goUpOneFloor());
+        mDriverController.povDown().onTrue(elevator.goDownOneFloor());
         mDriverController.x().onTrue(elevator.holdPosition());
         mDriverController.y().onTrue(elevator.stopElevator());
         limitTrigger.onTrue(elevator.stopElevator());

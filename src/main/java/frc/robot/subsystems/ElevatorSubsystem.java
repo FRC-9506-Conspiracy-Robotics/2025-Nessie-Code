@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -22,6 +25,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     //intialize motors
     private final SparkMax elevatorMotor = new SparkMax(CanId.elevatorMotorCan, MotorType.kBrushless);
     private final SparkMax elevatorFollower = new SparkMax(CanId.elevatorFollowerCan, MotorType.kBrushless);
+    private int currentFloor = 0;
+    private final int bottomFloor = 0;
+    private final int topFloor = 4;
+    private final double[] floorHeights = {0.0, 3.0, 12.0, 15.0, 18.0};
 
     //intitalize relative encoder based on the main motor
     private final RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
@@ -139,5 +146,23 @@ public class ElevatorSubsystem extends SubsystemBase {
                 System.out.println("Elevator Position: " + getHeightInches());
             }
         );
+    }
+
+    public Command goUpOneFloor() {
+        return run(() -> {
+            if (currentFloor < topFloor) {
+                currentFloor++;
+            }
+            reachHeight(floorHeights[currentFloor]);
+        });
+    }
+
+    public Command goDownOneFloor() {
+        return run(() -> {
+            if (currentFloor > bottomFloor) {
+                currentFloor--;
+            }
+            reachHeight(floorHeights[currentFloor]);
+        });
     }
 }

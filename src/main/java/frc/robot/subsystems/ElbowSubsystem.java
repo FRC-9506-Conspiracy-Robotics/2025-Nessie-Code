@@ -83,7 +83,11 @@ public class ElbowSubsystem extends SubsystemBase{
     }
 
     public void setZero() {
-        elbowEncoder.setPosition(0.0);
+        elbowEncoder.setPosition(EndEffectorConstants.restingAngle);
+    }
+
+    public Command resetZero() {
+        return run(() -> setZero());
     }
 
     public void elbowGoToAngle(double angleRad) {

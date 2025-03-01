@@ -10,9 +10,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -27,6 +29,8 @@ public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+    private final DigitalInput limitswitch = new DigitalInput(0);
+    private final Trigger limitTrigger = new Trigger(limitswitch::get);
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -72,6 +76,7 @@ public class RobotContainer {
         mDriverController.b().onTrue(elevator.setHeight(12.0));
         mDriverController.x().onTrue(elevator.holdPosition());
         mDriverController.y().onTrue(elevator.stopElevator());
+        limitTrigger.onTrue(elevator.stopElevator());
     }
 
     public Command getAutonomousCommand() {

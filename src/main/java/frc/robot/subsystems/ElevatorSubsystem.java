@@ -1,16 +1,12 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Meters;
-
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -85,7 +81,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public double getHeightInches() {
         return 
         (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
-        * (2 * Math.PI * ElevatorConstants.kSprocketPitch) / 2;
+        * (2 * Math.PI * ElevatorConstants.kSprocketPitch);
     }
 
     public double getVelocityInchesPerSecond() {
@@ -109,7 +105,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command setHeight(double height) {
         return run(() -> {
             reachHeight(height);
-            System.out.println("Elevator is currently at " + getHeightInches());
+            System.out.println("Elevator Position: " + getHeightInches());
             System.out.println("Velocity SP is " + elevatorPid.getSetpoint().velocity);
         });
     }
@@ -126,7 +122,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return MathUtil.isNear(
             height, 
             getHeightInches(), 
-            ElevatorConstants.kElevatorTolerance.in(Inches)
+            ElevatorConstants.kElevatorTolerance
         );
     }
 
@@ -138,9 +134,9 @@ public class ElevatorSubsystem extends SubsystemBase {
                 elevatorPid.reset(holdPoint);
             },
             () -> {
-                System.out.println("Trying to hold at " + holdPoint);
-                System.out.println("Elevator is at " + getHeightInches());
                 reachHeight(holdPoint);
+                System.out.println("Holding: " + holdPoint);
+                System.out.println("Elevator Position: " + getHeightInches());
             }
         );
     }

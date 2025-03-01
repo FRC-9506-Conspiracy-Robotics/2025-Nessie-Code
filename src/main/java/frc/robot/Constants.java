@@ -36,17 +36,17 @@ public final class Constants {
         public static final double l4Setpoint = 54;
         public static final double intakeSetpoint = 12;
 
-        public static final double kElevatorKp = 0.1;
+        public static final double kElevatorKp = 0.25;
         public static final double kElevatorKi = 0;
-        public static final double kElevatorKd = 1;
+        public static final double kElevatorKd = 0.0; //1;
 
-        public static final double kElevatorkS = 0.0;
-        public static final double kElevatorkV = 20;
-        public static final double kElevatorkA = 0.01;
+        public static final double kElevatorkS = 0.25;
+        public static final double kElevatorkV = 0.25;
+        public static final double kElevatorkA = 0.00;
         public static final double kElevatorkG = 0.25;
 
-        public static final double kMaxVelocity = 20;
-        public static final double kMaxAccel = 500;
+        public static final double kMaxVelocity = 30;
+        public static final double kMaxAccel = 100;
         public static final int kElevatorMaxCurrent = 40;
         public static final double kElevatorRampRate = 0.1;
         public static final double kElevatorTolerance = 1/32;

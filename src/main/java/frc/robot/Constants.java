@@ -34,6 +34,7 @@ public final class Constants {
 
     //measurements in degrees, where rotating up/counterclockwise is positive
     public static class EndEffectorConstants {
+        public static final double kIntakeSpeed = 0.2;
         public static final double startingAngle = Units.degreesToRadians(90);
         public static final double restingAngle = Units.degreesToRadians(30);
         public static final double clearanceAngle = Units.degreesToRadians(55);

@@ -100,7 +100,7 @@ public class ElbowSubsystem extends SubsystemBase{
     public Command setElbowAngle(double angleInRad) {
         return run(() -> {
                 elbowGoToAngle(angleInRad);
-                System.out.println("Elbow Position: ");
+                System.out.println("Elbow Position: " + getElbowAngleRad());
             }
         );
     }

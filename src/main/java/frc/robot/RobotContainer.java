@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriverConstants;
+import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import java.io.File;
@@ -31,6 +32,7 @@ public class RobotContainer {
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
     private final DigitalInput limitswitch = new DigitalInput(0);
     private final Trigger limitTrigger = new Trigger(limitswitch::get);
+    private final ElbowSubsystem elbow = new ElbowSubsystem();
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 

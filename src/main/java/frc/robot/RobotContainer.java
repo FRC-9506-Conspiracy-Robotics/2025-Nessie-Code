@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriverConstants;
+import frc.robot.subsystems.RGBSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -24,6 +25,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+    private final RGBSubsystem rgb = new RGBSubsystem();
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -65,6 +67,8 @@ public class RobotContainer {
         } else {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
+
+        rgb.staticRainbow();
     }
 
     public Command getAutonomousCommand() {

@@ -1,8 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -15,6 +12,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,6 +28,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final int bottomFloor = 0;
     private final int topFloor = 4;
     private final double[] floorHeights = {0.0, 3.0, 12.0, 15.0, 18.0};
+    private final DigitalInput elevatorLimitSwitch = new DigitalInput(0);
 
     //intitalize relative encoder based on the main motor
     private final RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
@@ -51,6 +51,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorkV,
             ElevatorConstants.kElevatorkA
         );
+    
+    public final Trigger elevatorLimitTrigger = new Trigger(elevatorLimitSwitch::get);
 
     public final Trigger minStop = 
         new Trigger(() -> MathUtil.isNear(
@@ -64,9 +66,22 @@ public class ElevatorSubsystem extends SubsystemBase {
         new Trigger(() -> MathUtil.isNear(
             getHeightInches(),
             ElevatorConstants.maxExtension,
-            1
+            0.1
             )
         );
+
+    public Command minStopWarning() {
+        return run(() -> {
+            System.out.println("ELEVATOR NEAR BOTTOM");
+        });
+    }
+
+    public Command maxStopCommand() {
+        return run(() -> {
+            stopElevator();
+            System.out.println("ELEVATOR NEAR TOP");
+        });
+    }
 
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
@@ -122,9 +137,20 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command stopElevator() {
-        return run(() -> {
+        return runOnce(() -> {
             stop();
             System.out.println("Stopping.");
+        });
+    }
+
+    public void zero() {
+        elevatorEncoder.setPosition(0.0);
+    }
+
+    public Command zeroElevator() {
+        return runOnce(() -> {
+            zero();
+            System.out.println("Zeroing.");
         });
     }
 
@@ -169,5 +195,12 @@ public class ElevatorSubsystem extends SubsystemBase {
             reachHeight(floorHeights[currentFloor]);
             System.out.println("Going down.");
         });
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Elevator Floor", currentFloor);
+        SmartDashboard.putNumber("Elevator Height", getHeightInches());
+        SmartDashboard.putBoolean("Bottom Limit", elevatorLimitTrigger.getAsBoolean());
     }
 }

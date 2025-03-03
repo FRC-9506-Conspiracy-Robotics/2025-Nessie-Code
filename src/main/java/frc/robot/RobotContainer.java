@@ -6,6 +6,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,8 +30,6 @@ public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
-    private final DigitalInput limitswitch = new DigitalInput(0);
-    private final Trigger limitTrigger = new Trigger(limitswitch::get);
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -77,7 +76,10 @@ public class RobotContainer {
         mDriverController.povDown().onTrue(elevator.goDownOneFloor());      
         mDriverController.x().onTrue(elevator.holdPosition());
         mDriverController.y().onTrue(elevator.stopElevator());
-        limitTrigger.onTrue(elevator.stopElevator());
+        
+        elevator.elevatorLimitTrigger.debounce(1, DebounceType.kBoth).onTrue(elevator.stopElevator().andThen(elevator.zeroElevator()));
+        elevator.minStop.whileTrue(elevator.minStopWarning());
+        elevator.maxStop.whileTrue(elevator.maxStopCommand());
     }
 
     public Command getAutonomousCommand() {

@@ -35,7 +35,9 @@ public class RobotContainer {
     private final DigitalInput limitswitch = new DigitalInput(0);
     private final Trigger limitTrigger = new Trigger(limitswitch::get);
     private final CameraSubsystem camera = new CameraSubsystem();
-
+    private double forward = -mDriverController.getLeftY() * Constants.SwerveConstants.maxSpeed;
+    private double strafe = -mDriverController.getLeftX() * Constants.SwerveConstants.maxSpeed;
+    private double turn = -mDriverController.getRightX();
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -76,7 +78,10 @@ public class RobotContainer {
             drivebase.setDefaultCommand(driveFieldOrientedAngularVelocityKeyboard);
         } else {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        
         }
+
+        camera.setDefaultCommand(camera.runAtAllMatch());
 
         mDriverController.povUp().onTrue(elevator.goUpOneFloor());
         mDriverController.povDown().onTrue(elevator.goDownOneFloor());      

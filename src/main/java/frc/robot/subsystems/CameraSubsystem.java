@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,31 +34,31 @@ public class CameraSubsystem extends SubsystemBase {
         public Command runAtAllMatch() {
 
             return run(() -> {
-                while (true) {
+        
                     var result = camera.getLatestResult();
                     boolean hasTargets = result.hasTargets();
 
                     if (!hasTargets) {
-                        continue;
+                    
+                        return;
                     }
 
                     List<PhotonTrackedTarget> targets = result.getTargets();
                     PhotonTrackedTarget bestTarget = result.getBestTarget();
 
+                    
                     System.out.println("This is X: " + bestTarget.getBestCameraToTarget().getX());
                     System.out.println("This is Y: " + bestTarget.getBestCameraToTarget().getY());
                     System.out.println("This is z: " + bestTarget.getBestCameraToTarget().getZ());
+
+                    System.out.println("This is yaw: " + bestTarget.getBestCameraToTarget().getRotation().getZ() * (180 / Math.PI));
 
                     try {
                         Thread.sleep(20);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                     }
-                }
-            });
+            }
+            );
         }
-
-
-
-
 }

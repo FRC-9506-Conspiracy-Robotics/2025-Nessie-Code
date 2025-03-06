@@ -60,7 +60,7 @@ public final class Constants {
         public static final double restingAngle = Units.degreesToRadians(30);
         public static final double clearanceAngle = Units.degreesToRadians(55);
         public static final double intakeAngle = Units.degreesToRadians(50);
-        public static final double kElbowGearing = 25;
+        public static final double kElbowGearing = 125;
 
         public static final double kMaxElbowVelocity = 1;
         public static final double kMaxElbowAccel = 1;
@@ -69,12 +69,12 @@ public final class Constants {
         
         public static final double kElbowKp = 1;
         public static final double kElbowKi = 0;
-        public static final double kElbowKd = 0.5;
+        public static final double kElbowKd = 0;
         
         public static final double kElbowkS = 0.0;
-        public static final double kElbowkV = 0.5;
-        public static final double kElbowkA = 0.04;
-        public static final double kElbowkG = 1;
+        public static final double kElbowkV = 3.0;
+        public static final double kElbowkA = 0.0;
+        public static final double kElbowkG = 0.1;
 
         public static final double wristHorizontalAngle = 0;
         public static final double wristVerticalAngle = 90;

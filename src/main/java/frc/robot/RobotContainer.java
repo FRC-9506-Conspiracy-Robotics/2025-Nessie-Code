@@ -77,9 +77,12 @@ public class RobotContainer {
 
         mDriverController.povUp().onTrue(elevator.goUpOneFloor().andThen(elevator.holdPosition(false)));
         mDriverController.povDown().onTrue(elevator.goDownOneFloor().andThen(elevator.holdPosition(false)));      
-        mDriverController.x().onTrue(elevator.holdPosition(true));
-        mDriverController.y().onTrue(elevator.stopElevator());
+        //mDriverController.x().onTrue(elevator.holdPosition(true));
+        //mDriverController.y().onTrue(elevator.stopElevator());
         limitTrigger.onTrue(elevator.stopElevator());
+        mDriverController.a().onTrue(elbow.setElbowAngle(1));
+        mDriverController.b().onTrue(elbow.setElbowAngle(0));
+        mDriverController.x().onTrue(elbow.stopElbow());
     }
 
     public Command getAutonomousCommand() {

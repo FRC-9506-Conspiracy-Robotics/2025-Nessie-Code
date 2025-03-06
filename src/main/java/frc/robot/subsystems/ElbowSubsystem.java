@@ -45,7 +45,7 @@ public class ElbowSubsystem extends SubsystemBase{
         config.idleMode(IdleMode.kCoast)
         .smartCurrentLimit(EndEffectorConstants.kElbowCurrentLimit)
         .closedLoopRampRate(0)
-        .inverted(true);
+        .inverted(false);
 
         elbowMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -93,7 +93,7 @@ public class ElbowSubsystem extends SubsystemBase{
     public void elbowGoToAngle(double angleRad) {
         double voltsOut = MathUtil.clamp(
             elbowPid.calculate(getElbowAngleRad(), angleRad)
-            + elbowFeed.calculateWithVelocities(getElbowAngleRad(), getElbowVelocityRadPerSec(), elbowPid.getSetpoint().velocity),
+            + elbowFeed.calculateWithVelocities(getElbowAngleRad(), elbowPid.getSetpoint().velocity, elbowPid.getSetpoint().velocity),
             -12,
             12
         );
@@ -103,8 +103,11 @@ public class ElbowSubsystem extends SubsystemBase{
 
     public Command setElbowAngle(double angleInRad) {
         return run(() -> {
-                elbowGoToAngle(angleInRad);
+                elbowGoToAngle(angleInRad); 
+
+                if (!(elbowPid.getSetpoint().velocity == 0))  {
                 System.out.println("Elbow Position: " + getElbowAngleRad());
+                }
             }
         );
     }

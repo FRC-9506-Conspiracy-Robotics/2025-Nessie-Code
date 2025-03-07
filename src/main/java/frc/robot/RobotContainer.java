@@ -6,6 +6,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -35,6 +36,7 @@ public class RobotContainer {
     private final Trigger limitTrigger = new Trigger(limitswitch::get);
     private final ElbowSubsystem elbow = new ElbowSubsystem();
     private final ClawSubsystem claw = new ClawSubsystem();
+
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -90,6 +92,7 @@ public class RobotContainer {
         mDriverController.x().onTrue(claw.holdClaw());
         mDriverController.a().onTrue(claw.setWristAngle(1.4));
         mDriverController.b().onTrue(claw.setWristAngle(-0.017));
+
 
     }
 

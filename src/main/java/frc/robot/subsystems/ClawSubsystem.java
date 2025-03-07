@@ -43,18 +43,27 @@ public class ClawSubsystem extends SubsystemBase{
         );
     
     public ClawSubsystem() {
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.idleMode(IdleMode.kBrake)
+
+        SparkMaxConfig wristConfig = new SparkMaxConfig();
+        wristConfig.idleMode(IdleMode.kCoast)
+        .smartCurrentLimit(EndEffectorConstants.kWristCurrentLimit)
+        .closedLoopRampRate(0)
+        .inverted(false);
+
+        wristMotor.configure(wristConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+        SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        intakeConfig.idleMode(IdleMode.kBrake)
         .smartCurrentLimit(EndEffectorConstants.kWristCurrentLimit)
         .closedLoopRampRate(0);
         
-        intakeMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        intakeMotor.configure(intakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 
-        SparkMaxConfig followConfig = new SparkMaxConfig();
-        followConfig.idleMode(IdleMode.kBrake)
+        SparkMaxConfig intakeFollowerConfig = new SparkMaxConfig();
+        intakeFollowerConfig.idleMode(IdleMode.kBrake)
         .follow(CanId.intakeMotorCan, true);
 
-        intakeFollower.configure(followConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        intakeFollower.configure(intakeFollowerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public Command runIntake() {
@@ -83,7 +92,7 @@ public class ClawSubsystem extends SubsystemBase{
     public void wristGoToAngle(double angleRad) {
         double voltsOut = MathUtil.clamp(
             wristPid.calculate(getWristAngleRad(), angleRad)
-            + wristFeed.calculateWithVelocities(getWristAngleRad(), getWristVelocityRadPerSec(), wristPid.getSetpoint().velocity),
+            + wristFeed.calculateWithVelocities(getWristAngleRad(), wristPid.getSetpoint().velocity, wristPid.getSetpoint().velocity),
             -12,
             12
         );

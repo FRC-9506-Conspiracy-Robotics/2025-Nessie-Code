@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriverConstants;
+import frc.robot.commands.ReceiveCoralConfiguration;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -36,7 +37,8 @@ public class RobotContainer {
     private final Trigger limitTrigger = new Trigger(limitswitch::get);
     private final ElbowSubsystem elbow = new ElbowSubsystem();
     private final ClawSubsystem claw = new ClawSubsystem();
-
+    private final ReceiveCoralConfiguration receiveCoralSequence = new ReceiveCoralConfiguration(
+        elevator, claw, elbow);
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -98,6 +100,9 @@ public class RobotContainer {
         // TODO: @Alberto
         // Map the intake commands to buttons here. You have 3 commands: 
         // runIntake, stopIntake, and reverse the intake.
+
+        // TODO: @Alberto, figure out if this command sequence works the way it's supposed to.
+        // mDriverController.y().toggleOnTrue(receiveCoralSequence.getIntoCoralReceiveConfig());
     }
 
     public Command getAutonomousCommand() {

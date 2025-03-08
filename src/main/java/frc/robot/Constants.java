@@ -36,17 +36,17 @@ public final class Constants {
         public static final double l4Setpoint = 54;
         public static final double intakeSetpoint = 12;
 
-        public static final double kElevatorKp = 0.1;
+        public static final double kElevatorKp = 0.25;
         public static final double kElevatorKi = 0;
-        public static final double kElevatorKd = 1;
+        public static final double kElevatorKd = 0.0; //1;
 
-        public static final double kElevatorkS = 0.0;
-        public static final double kElevatorkV = 20;
-        public static final double kElevatorkA = 0.01;
+        public static final double kElevatorkS = 0.25;
+        public static final double kElevatorkV = 0.25;
+        public static final double kElevatorkA = 0.00;
         public static final double kElevatorkG = 0.25;
 
-        public static final double kMaxVelocity = 20;
-        public static final double kMaxAccel = 500;
+        public static final double kMaxVelocity = 30;
+        public static final double kMaxAccel = 100;
         public static final int kElevatorMaxCurrent = 40;
         public static final double kElevatorRampRate = 0.1;
         public static final double kElevatorTolerance = 1/32;
@@ -55,11 +55,43 @@ public final class Constants {
 
     //measurements in degrees, where rotating up/counterclockwise is positive
     public static class EndEffectorConstants {
-        public static final Angle startingAngle = Degrees.of(60);
-        public static final Angle restingAngle = Degrees.of(0);
-        public static final Angle clearanceAngle = Degrees.of(25);
-        public static final Angle intakeAngle = Degrees.of(20);
-        public static final Angle wristHorizontalAngle = Degrees.of(0);
-        public static final Angle wristVerticalAngle = Degrees.of(90);
+        public static final double kIntakeSpeed = 0.2;
+        public static final double startingAngle = Units.degreesToRadians(90);
+        public static final double restingAngle = Units.degreesToRadians(30);
+        public static final double clearanceAngle = Units.degreesToRadians(55);
+        public static final double intakeAngle = Units.degreesToRadians(50);
+        public static final double kElbowGearing = 125;
+
+        public static final double kMaxElbowVelocity = 1;
+        public static final double kMaxElbowAccel = 1;
+        public static final int kElbowCurrentLimit = 40;
+        public static final double kElbowRampRate = 0.25;
+        
+        public static final double kElbowKp = 1;
+        public static final double kElbowKi = 0;
+        public static final double kElbowKd = 0;
+        
+        public static final double kElbowkS = 0.0;
+        public static final double kElbowkV = 3.0;
+        public static final double kElbowkA = 0.0;
+        public static final double kElbowkG = 0.1;
+
+        public static final double wristHorizontalAngle = 0;
+        public static final double wristVerticalAngle = 90;
+        public static final double kWristGearing = 16;
+
+        public static final double kMaxWristVelocity = 2;
+        public static final double kMaxWristAccel = 4;
+        public static final int kWristCurrentLimit = 40;
+        public static final double kWristRampRate = 0.1;
+
+        public static final double kWristKp = 1;
+        public static final double kWristKi = 0;
+        public static final double kWristKd = 0;
+        
+        public static final double kWristkS = 0.5;
+        public static final double kWristkV = 0.15;
+        public static final double kWristkA = 0.0;
+        public static final double kWristkG = 0;
     }
 }

@@ -6,6 +6,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,6 +21,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriverConstants;
+import frc.robot.commands.ReceiveCoralConfiguration;
+import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import java.io.File;
@@ -31,6 +35,10 @@ public class RobotContainer {
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
     private final DigitalInput limitswitch = new DigitalInput(0);
     private final Trigger limitTrigger = new Trigger(limitswitch::get);
+    private final ElbowSubsystem elbow = new ElbowSubsystem();
+    private final ClawSubsystem claw = new ClawSubsystem();
+    private final ReceiveCoralConfiguration receiveCoralSequence = new ReceiveCoralConfiguration(
+        elevator, claw, elbow);
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -73,11 +81,31 @@ public class RobotContainer {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
 
-        mDriverController.povUp().onTrue(elevator.goUpOneFloor());
-        mDriverController.povDown().onTrue(elevator.goDownOneFloor());      
-        mDriverController.x().onTrue(elevator.holdPosition());
-        mDriverController.y().onTrue(elevator.stopElevator());
+        // TODO: @Alberto
+        // Make sure to change the elevator commands from "onTrue" to "toggleOnTrue"
+        mDriverController.povUp().toggleOnTrue(elevator.goUpOneFloor().andThen(elevator.holdPosition(false)));
+        mDriverController.povDown().toggleOnTrue(elevator.goDownOneFloor().andThen(elevator.holdPosition(false)));  
+        mDriverController.povLeft().onTrue(elbow.setElbowAngle(1));
+        mDriverController.povRight().onTrue(elbow.setElbowAngle(0));  
+
+        //mDriverController.x().onTrue(elevator.holdPosition(true));
+        //mDriverController.y().onTrue(elevator.stopElevator());
         limitTrigger.onTrue(elevator.stopElevator());
+        //mDriverController.a().onTrue(elbow.setElbowAngle(1));
+        //mDriverController.b().onTrue(elbow.setElbowAngle(0));
+        //mDriverController.x().onTrue(claw.holdClaw());
+        //mDriverController.a().onTrue(claw.setWristAngle(1.4));
+        //mDriverController.b().onTrue(claw.setWristAngle(-0.017));
+        
+        // TODO: @Alberto
+        // Map the intake commands to buttons here. You have 3 commands: 
+        // runIntake, stopIntake, and reverse the intake.
+        mDriverController.a().whileTrue(claw.runIntake());
+        mDriverController.x().whileTrue(claw.reverseIntake());
+        mDriverController.b().onTrue(claw.stopIntake());
+
+        // TODO: @Alberto, figure out if this command sequence works the way it's supposed to.
+        // mDriverController.y().toggleOnTrue(receiveCoralSequence.getIntoCoralReceiveConfig());
     }
 
     public Command getAutonomousCommand() {

@@ -158,6 +158,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             }
             reachHeight(floorHeights[currentFloor]);
             System.out.println("Going up.");
+            //a
         });
     }
 

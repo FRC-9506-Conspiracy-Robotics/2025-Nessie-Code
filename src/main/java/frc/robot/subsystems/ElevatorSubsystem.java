@@ -188,7 +188,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             if (currentFloor < topFloor) {
                 currentFloor++;
             }
-            System.out.println("going up");
+            reachHeight(floorHeights[currentFloor]);
+            System.out.println("Going up.");
         });
     }
 
@@ -197,6 +198,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             if (currentFloor > bottomFloor) {
                 currentFloor--;
             }
+            reachHeight(floorHeights[currentFloor]);
             System.out.println("Going down");
         });
     }

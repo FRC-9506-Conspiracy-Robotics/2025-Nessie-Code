@@ -83,9 +83,9 @@ public class RobotContainer {
 
         // TODO: @Alberto
         // Make sure to change the elevator commands from "onTrue" to "toggleOnTrue"
-        mDriverController.povUp().toggleOnTrue(elevator.goUpOneFloor().andThen(elevator.holdPosition(false)));
-        mDriverController.povDown().toggleOnTrue(elevator.goDownOneFloor().andThen(elevator.holdPosition(false)));  
-        mDriverController.povLeft().onTrue(elbow.setElbowAngle(1));
+        mDriverController.povUp().onTrue(elevator.goUpOneFloor().andThen(elevator.holdPosition(false)));
+        mDriverController.povDown().onTrue(elevator.goDownOneFloor().andThen(elevator.holdPosition(false)));  
+        mDriverController.povLeft().onTrue(elbow.setElbowAngle(.5));
         mDriverController.povRight().onTrue(elbow.setElbowAngle(0));  
 
         //mDriverController.x().onTrue(elevator.holdPosition(true));
@@ -94,8 +94,8 @@ public class RobotContainer {
         //mDriverController.a().onTrue(elbow.setElbowAngle(1));
         //mDriverController.b().onTrue(elbow.setElbowAngle(0));
         //mDriverController.x().onTrue(claw.holdClaw());
-        //mDriverController.a().onTrue(claw.setWristAngle(1.4));
-        //mDriverController.b().onTrue(claw.setWristAngle(-0.017));
+        mDriverController.leftBumper().onTrue(claw.setWristAngle(1.4));
+        mDriverController.rightBumper().onTrue(claw.setWristAngle(-0.017));
         
         // TODO: @Alberto
         // Map the intake commands to buttons here. You have 3 commands: 
@@ -105,7 +105,7 @@ public class RobotContainer {
         mDriverController.b().onTrue(claw.stopIntake());
 
         // TODO: @Alberto, figure out if this command sequence works the way it's supposed to.
-        // mDriverController.y().toggleOnTrue(receiveCoralSequence.getIntoCoralReceiveConfig());
+        //mDriverController.y().toggleOnTrue(receiveCoralSequence.getIntoCoralReceiveConfig());
     }
 
     public Command getAutonomousCommand() {

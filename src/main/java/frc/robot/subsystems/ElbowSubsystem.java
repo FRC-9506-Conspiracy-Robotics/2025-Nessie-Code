@@ -44,8 +44,8 @@ public class ElbowSubsystem extends SubsystemBase{
         SparkMaxConfig config = new SparkMaxConfig();
         config.idleMode(IdleMode.kCoast)
         .smartCurrentLimit(EndEffectorConstants.kElbowCurrentLimit)
-        .closedLoopRampRate(0)
-        .inverted(false);
+        .closedLoopRampRate(0) 
+        .inverted(true);
 
         elbowMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }

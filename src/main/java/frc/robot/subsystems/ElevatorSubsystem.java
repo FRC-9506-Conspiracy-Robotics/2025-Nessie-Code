@@ -180,7 +180,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 }
                 
             }
-        );
+        ).withTimeout(1.5);
     }
 
     public Command goUpOneFloor() {

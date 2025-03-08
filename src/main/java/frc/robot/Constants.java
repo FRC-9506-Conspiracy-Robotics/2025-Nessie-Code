@@ -33,7 +33,7 @@ public final class Constants {
         public static final double maxExtension = 28; //for stage 1
         public static final double l2Setpoint = 24;
         public static final double l3Setpoint = 40;
-        public static final double l4Setpoint = 54;
+        public static final double l4Setpoint = 55;
         public static final double intakeSetpoint = 12;
 
         public static final double kElevatorKp = 0.25;

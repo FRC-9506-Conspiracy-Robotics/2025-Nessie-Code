@@ -77,6 +77,9 @@ public class ClawSubsystem extends SubsystemBase{
         );
     }
 
+    // TODO: @Alberto
+    // Make a new command to reverse the intake
+
     public void stop() {
         intakeMotor.set(0.0);
     }

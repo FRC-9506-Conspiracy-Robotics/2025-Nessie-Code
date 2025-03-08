@@ -79,6 +79,8 @@ public class RobotContainer {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
 
+        // TODO: @Alberto
+        // Make sure to change the elevator commands from "onTrue" to "toggleOnTrue"
         mDriverController.povUp().onTrue(elevator.goUpOneFloor().andThen(elevator.holdPosition(false)));
         mDriverController.povDown().onTrue(elevator.goDownOneFloor().andThen(elevator.holdPosition(false)));  
         mDriverController.povLeft().onTrue(elbow.setElbowAngle(1));
@@ -92,8 +94,10 @@ public class RobotContainer {
         mDriverController.x().onTrue(claw.holdClaw());
         mDriverController.a().onTrue(claw.setWristAngle(1.4));
         mDriverController.b().onTrue(claw.setWristAngle(-0.017));
-
-
+        
+        // TODO: @Alberto
+        // Map the intake commands to buttons here. You have 3 commands: 
+        // runIntake, stopIntake, and reverse the intake.
     }
 
     public Command getAutonomousCommand() {

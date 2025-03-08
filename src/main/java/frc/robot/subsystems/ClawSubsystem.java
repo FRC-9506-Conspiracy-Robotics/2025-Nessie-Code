@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import javax.xml.stream.events.EndDocument;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -77,8 +79,16 @@ public class ClawSubsystem extends SubsystemBase{
         );
     }
 
-    // TODO: @Alberto
-    // Make a new command to reverse the intake
+    public Command reverseIntake() {
+        return startEnd(
+            () -> {
+                intakeMotor.set(-EndEffectorConstants.kIntakeSpeed);
+            },
+            () -> {
+                intakeMotor.set(0);
+            }
+        );
+    }
 
     public void stop() {
         intakeMotor.set(0.0);

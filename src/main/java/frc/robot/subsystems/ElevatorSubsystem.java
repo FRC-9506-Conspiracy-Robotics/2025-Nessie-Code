@@ -12,7 +12,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -51,8 +50,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorkV,
             ElevatorConstants.kElevatorkA
         );
-    
-    public final Trigger elevatorLimitTrigger = new Trigger(elevatorLimitSwitch::get);
 
     public final Trigger minStop = 
         new Trigger(() -> MathUtil.isNear(
@@ -204,10 +201,15 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
+    public Command goToFloor(int targetFloor) {
+        return runOnce(() -> {
+            currentFloor = targetFloor;
+        });
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Elevator Floor", currentFloor);
         SmartDashboard.putNumber("Elevator Height", getHeightInches());
-        SmartDashboard.putBoolean("Bottom Limit", elevatorLimitTrigger.getAsBoolean());
     }
 }

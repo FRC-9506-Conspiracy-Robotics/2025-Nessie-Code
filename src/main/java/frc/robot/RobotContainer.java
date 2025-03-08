@@ -83,8 +83,8 @@ public class RobotContainer {
 
         // TODO: @Alberto
         // Make sure to change the elevator commands from "onTrue" to "toggleOnTrue"
-        mDriverController.povUp().onTrue(elevator.goUpOneFloor().andThen(elevator.holdPosition(false)));
-        mDriverController.povDown().onTrue(elevator.goDownOneFloor().andThen(elevator.holdPosition(false)));  
+        mDriverController.povUp().onTrue(elevator.raiseGoalHeightCommand());
+        mDriverController.povDown().onTrue(elevator.lowerGoalHeightCommand());  
         mDriverController.povLeft().onTrue(elbow.setElbowAngle(.5));
         mDriverController.povRight().onTrue(elbow.setElbowAngle(0));  
 

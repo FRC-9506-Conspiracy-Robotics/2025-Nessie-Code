@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.time.Period;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -67,8 +70,9 @@ public class ElevatorSubsystem extends SubsystemBase {
             )
         );
 
-    public Command minStopWarning() {
+    public Command minStopCommand() {
         return run(() -> {
+            stopElevator();
             System.out.println("ELEVATOR NEAR BOTTOM");
         });
     }
@@ -98,8 +102,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getHeightInches() {
-        return 
-        (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
+        return (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
         * (2 * Math.PI * ElevatorConstants.kSprocketPitch);
     }
 
@@ -209,9 +212,42 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
+    private double periodicGoalHeight = 0;
+    public void periodicMoveTo(double goalHeight) {
+        if (!MathUtil.isNear(goalHeight, getHeightInches(), ElevatorConstants.kElevatorTolerance)) {
+            setHeight(getHeightInches() + ElevatorConstants.kMaxVelocity);
+        } else {
+            holdPosition(true);
+        }
+    }
+
+    public void raiseGoalHeight() {
+        if (currentFloor < topFloor)
+        {
+            currentFloor++;
+            periodicGoalHeight = floorHeights[currentFloor];
+        }
+    }
+
+    public Command raiseGoalHeightCommand() {
+        return run(() -> raiseGoalHeight());
+    }
+
+    public void lowerGoalHeight() {
+        if (currentFloor > bottomFloor) {
+            currentFloor--;
+            periodicGoalHeight = floorHeights[currentFloor];
+        }
+    }
+
+    public Command lowerGoalHeightCommand() {
+        return run(() -> lowerGoalHeight());
+    }
+
     @Override
     public void periodic() {
+        periodicMoveTo(periodicGoalHeight);
         SmartDashboard.putNumber("Elevator Floor", currentFloor);
         SmartDashboard.putNumber("Elevator Height", getHeightInches());
     }
-}
+} 

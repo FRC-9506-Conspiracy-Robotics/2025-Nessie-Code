@@ -11,8 +11,13 @@ public final class Constants {
         public static final double kDeadband = 0.05;
     }
 
+    public static class VisionConstants {
+        public static final double visionTurnkP = 1.0;
+    }
+
     public static class SwerveConstants {
         public static final double maxSpeed = Units.feetToMeters(15);
+        public static final double maxAngularSpeedDegPerSec = 90.0;
     }
 
     public static class CanId {

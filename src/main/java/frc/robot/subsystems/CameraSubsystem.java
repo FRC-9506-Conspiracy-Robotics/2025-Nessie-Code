@@ -30,6 +30,16 @@ public class CameraSubsystem extends SubsystemBase {
             
         }
         
+        public PhotonTrackedTarget getBestTarget() {
+            var result = camera.getLatestResult();
+            boolean hasTargets = result.hasTargets();
+
+            if (!hasTargets) {
+                return null;
+            }
+
+            return result.getBestTarget();
+        }
         
         public Command runAtAllMatch() {
 

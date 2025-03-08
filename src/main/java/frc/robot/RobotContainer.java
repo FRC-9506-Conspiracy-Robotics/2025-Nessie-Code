@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.DriverConstants;
+import frc.robot.commands.AutoAlign;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -35,6 +36,7 @@ public class RobotContainer {
     private final DigitalInput limitswitch = new DigitalInput(0);
     private final Trigger limitTrigger = new Trigger(limitswitch::get);
     private final CameraSubsystem camera = new CameraSubsystem();
+    private final AutoAlign autoAlignProgram = new AutoAlign(drivebase, camera);
     private double forward = -mDriverController.getLeftY() * Constants.SwerveConstants.maxSpeed;
     private double strafe = -mDriverController.getLeftX() * Constants.SwerveConstants.maxSpeed;
     private double turn = -mDriverController.getRightX();
@@ -83,6 +85,7 @@ public class RobotContainer {
 
         camera.setDefaultCommand(camera.runAtAllMatch());
 
+        mDriverController.a().whileTrue(autoAlignProgram.autoAlign());
         mDriverController.povUp().onTrue(elevator.goUpOneFloor());
         mDriverController.povDown().onTrue(elevator.goDownOneFloor());      
         mDriverController.x().onTrue(elevator.holdPosition());

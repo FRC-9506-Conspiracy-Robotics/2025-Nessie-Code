@@ -11,12 +11,11 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanId;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -25,16 +24,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final SparkMax elevatorMotor = new SparkMax(CanId.elevatorMotorCan, MotorType.kBrushless);
     private final SparkMax elevatorFollower = new SparkMax(CanId.elevatorFollowerCan, MotorType.kBrushless);
     
-    private final DigitalInput bottomLimitSwitch;
+    private final DigitalInput bottomLimitSwitch = new DigitalInput(0);
     private boolean homedStatus = false;
+    private boolean previousLimitVal = false;
 
-    private double currentTarget = ElevatorConstants.minExtension;
-    private double currentPosition;
     private double targetPosition;
-    private TrapezoidProfile.State currentState;
-    private TrapezoidProfile.State goalState;
-    private final TrapezoidProfile currentProfile;
-
     private int currentFloor = 0;
     private final int bottomFloor = 0;
     private final int topFloor = 3;
@@ -67,6 +61,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorkA
         );
 
+    Trigger bottomTrigger = new Trigger(() -> bottomLimitSwitch.get());
 
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
@@ -83,8 +78,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         .follow(elevatorMotor, true);
 
         elevatorFollower.configure(followerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-
-        bottomLimitSwitch = new DigitalInput(0);
 
         elevatorPid.setTolerance(ElevatorConstants.kElevatorTolerance);
     }
@@ -104,12 +97,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorEncoder.setPosition(0.0);
         homedStatus = true;
         targetPosition = 0.0;
-        currentState = new TrapezoidProfile.State(ElevatorConstants.minExtension, 0);
-        goalState = new TrapezoidProfile.State(ElevatorConstants.minExtension, 0);
-        elevatorPid.reset(currentState);
+        elevatorPid.reset(0.0);
     }
 
     public void handleOutOfBounds() {
+        homedStatus = false;
         elevatorMotor.set(0.0);
         homeElevator();
     }
@@ -125,12 +117,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         return homedStatus;
     }
 
-    private double calculateFeedForward(TrapezoidProfile.State state) {
-        return ElevatorConstants.kElevatorkS * Math.signum(state.velocity) +
-            ElevatorConstants.kElevatorkG +
-            ElevatorConstants.kElevatorkV * state.velocity;
-    }
-
     public void setHeightInches(double height) {
         if (!homedStatus && height > 0) {
             System.out.println("WARNING: Elevator not homed");
@@ -138,7 +124,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         targetPosition = MathUtil.clamp(height, ElevatorConstants.minExtension, ElevatorConstants.maxExtension);
-        goalState = new TrapezoidProfile.State(targetPosition, 0);
     }
 
     public void reachHeight(double height) {
@@ -174,24 +159,32 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command goToCurrentFloor() {
         return runOnce(
-            () -> {reachHeight(floorHeights[currentFloor]);});
+            () -> {setHeightInches(floorHeights[currentFloor]);});
     }
 
     public Command goToFloor(int floor) {
-        return runOnce(() -> {reachHeight(floorHeights[floor]);});
+        return runOnce(() -> {setHeightInches(floorHeights[floor]);});
     }
 
     public Command goToBottom() {
-        return runOnce(() -> {reachHeight(0.0);});
+        return runOnce(() -> {setHeightInches(ElevatorConstants.minExtension);});
+    }
+
+    public boolean bottomLimitRising() {
+        boolean currLimitVal = bottomTrigger.debounce(0.1).getAsBoolean();
+        
+        if (currLimitVal && !previousLimitVal) {
+            previousLimitVal = currLimitVal;
+            return true;
+        }
+        previousLimitVal = currLimitVal;
+        return false;
     }
 
     @Override
     public void periodic() {
-        currentPosition = getHeightInches();
 
-        currentState = currentProfile.calculate(0.02, currentState, goalState);
-
-        if (bottomLimitSwitch.get()) {
+        if (bottomLimitRising()) {
             handleBottomLimit();
         }
 
@@ -200,12 +193,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         if (isHomed()) {
-            double pidOutput = elevatorPid.calculate(getHeightInches(), currentState.position);
-            double feedOutput = calculateFeedForward(currentState);
-
-            double outputVolts = MathUtil.clamp(pidOutput + feedOutput, -12, 12);
-            elevatorMotor.set(outputVolts);
+            double voltsOut = MathUtil.clamp(
+                elevatorPid.calculate(getHeightInches(), targetPosition) +
+                elevatorFeed.calculate(
+                    elevatorPid.getSetpoint().velocity
+                ),
+                -12, 12 
+            );
+            elevatorMotor.setVoltage(voltsOut);
         }
-        
     }
 } 

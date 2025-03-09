@@ -13,12 +13,10 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanId;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -35,6 +33,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double targetPosition;
     private TrapezoidProfile.State currentState;
     private TrapezoidProfile.State goalState;
+    private final TrapezoidProfile currentProfile;
 
     private int currentFloor = 0;
     private final int bottomFloor = 0;
@@ -110,6 +109,22 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorPid.reset(currentState);
     }
 
+    public void handleOutOfBounds() {
+        elevatorMotor.set(0.0);
+        homeElevator();
+    }
+
+    public void homeElevator() {
+        elevatorMotor.set(-0.1);
+        if (bottomLimitSwitch.get()) {
+            handleBottomLimit();
+        }
+    }
+
+    public boolean isHomed() {
+        return homedStatus;
+    }
+
     private double calculateFeedForward(TrapezoidProfile.State state) {
         return ElevatorConstants.kElevatorkS * Math.signum(state.velocity) +
             ElevatorConstants.kElevatorkG +
@@ -119,7 +134,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setHeightInches(double height) {
         if (!homedStatus && height > 0) {
             System.out.println("WARNING: Elevator not homed");
+            return;
         }
+
+        targetPosition = MathUtil.clamp(height, ElevatorConstants.minExtension, ElevatorConstants.maxExtension);
+        goalState = new TrapezoidProfile.State(targetPosition, 0);
     }
 
     public void reachHeight(double height) {
@@ -166,12 +185,27 @@ public class ElevatorSubsystem extends SubsystemBase {
         return runOnce(() -> {reachHeight(0.0);});
     }
 
-    public 
-
     @Override
     public void periodic() {
         currentPosition = getHeightInches();
 
+        currentState = currentProfile.calculate(0.02, currentState, goalState);
 
+        if (bottomLimitSwitch.get()) {
+            handleBottomLimit();
+        }
+
+        if (getHeightInches() >= ElevatorConstants.maxExtension) {
+            handleOutOfBounds();
+        }
+
+        if (isHomed()) {
+            double pidOutput = elevatorPid.calculate(getHeightInches(), currentState.position);
+            double feedOutput = calculateFeedForward(currentState);
+
+            double outputVolts = MathUtil.clamp(pidOutput + feedOutput, -12, 12);
+            elevatorMotor.set(outputVolts);
+        }
+        
     }
 } 

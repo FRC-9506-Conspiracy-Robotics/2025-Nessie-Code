@@ -31,7 +31,6 @@ public class ReceiveCoralConfiguration {
         return this.elevator.goToFloor(1)
         .andThen(
             Commands.parallel(
-                this.elevator.holdPosition(false),
                 this.elbow.setElbowAngle(0.0),
                 this.claw.setWristAngle(0.0),
                 this.claw.runIntake()

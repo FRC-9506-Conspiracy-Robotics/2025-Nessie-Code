@@ -54,35 +54,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorkA
         );
 
-    public final Trigger minStop = 
-        new Trigger(() -> MathUtil.isNear(
-            getHeightInches(),
-            ElevatorConstants.minExtension,
-            1
-            )
-        );
-    
-    public final Trigger maxStop = 
-        new Trigger(() -> MathUtil.isNear(
-            getHeightInches(),
-            ElevatorConstants.maxExtension,
-            0.1
-            )
-        );
-
-    public Command minStopCommand() {
-        return run(() -> {
-            stopElevator();
-            System.out.println("ELEVATOR NEAR BOTTOM");
-        });
-    }
-
-    public Command maxStopCommand() {
-        return run(() -> {
-            stopElevator();
-            System.out.println("ELEVATOR NEAR TOP");
-        });
-    }
 
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
@@ -124,130 +95,34 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorMotor.setVoltage(voltsOut);
     }
 
-    public Command setHeight(double height) {
-        return run(() -> {
-            reachHeight(height);
-            System.out.println("Elevator Position: " + getHeightInches());
-            System.out.println("Velocity SP is " + elevatorPid.getSetpoint().velocity);
-        });
-    }
-
-    public void stop() {
-        elevatorMotor.set(0.0);
-    }
-
-    public Command stopElevator() {
+    public Command goingUpCommand() {
         return runOnce(() -> {
-            stop();
-        });
-    }
-
-    public void zero() {
-        elevatorEncoder.setPosition(0.0);
-    }
-
-    public Command zeroElevator() {
-        return runOnce(() -> {
-            zero();
-            System.out.println("Zeroing.");
-        });
-    }
-
-    public boolean aroundHeight(double height, double tolerance) {
-        return MathUtil.isNear(
-            height, 
-            getHeightInches(), 
-            ElevatorConstants.kElevatorTolerance
+                if (currentFloor < topFloor) {
+                  currentFloor++;
+                }
+            }
         );
     }
 
-    private double holdPoint = 0;
-    public Command holdPosition(boolean holdCurrentPosition) {
-        return startRun(
-            () -> {
-                if (holdCurrentPosition) {
-                    holdPoint = getHeightInches();
-                    elevatorPid.reset(holdPoint);
-                } else {
-                    holdPoint = floorHeights[currentFloor];
+    public Command goingDownCommand() {
+        return runOnce(() -> {
+                if (currentFloor > bottomFloor) {
+                    currentFloor--;
                 }
-                System.out.println("Holding at " + holdPoint);
-            },
-            () -> {
-                reachHeight(holdPoint);
-                var velSP = elevatorPid.getSetpoint().velocity;
-                if (Math.abs(velSP) > 0.0) {
-                    System.out.println("Holding: " + holdPoint);
-                    System.out.println("Elevator Position: " + getHeightInches());
-                    System.out.println("Velocity SP is " + elevatorPid.getSetpoint().velocity);
-                }
-                
             }
-        ).withTimeout(1.5);
+        );
     }
 
-    public Command goUpOneFloor() {
-        return runOnce(() -> {
-            if (currentFloor < topFloor) {
-                currentFloor++;
-            }
-            reachHeight(floorHeights[currentFloor]);
-            System.out.println("Going up.");
-        });
+    public Command goToCurrentFloor() {
+        return runOnce(
+            () -> {reachHeight(floorHeights[currentFloor]);});
     }
 
-    public Command goDownOneFloor() {
-        return runOnce(() -> {
-            if (currentFloor > bottomFloor) {
-                currentFloor--;
-            }
-            reachHeight(floorHeights[currentFloor]);
-            System.out.println("Going down");
-        });
+    public Command goToFloor(int floor) {
+        return runOnce(() -> {reachHeight(floorHeights[floor]);});
     }
 
-    public Command goToFloor(int targetFloor) {
-        return runOnce(() -> {
-            currentFloor = targetFloor;
-        });
-    }
-
-    private double periodicGoalHeight = 0;
-    public void periodicMoveTo(double goalHeight) {
-        if (!MathUtil.isNear(goalHeight, getHeightInches(), ElevatorConstants.kElevatorTolerance)) {
-            setHeight(getHeightInches() + ElevatorConstants.kMaxVelocity);
-        } else {
-            holdPosition(true);
-        }
-    }
-
-    public void raiseGoalHeight() {
-        if (currentFloor < topFloor)
-        {
-            currentFloor++;
-            periodicGoalHeight = floorHeights[currentFloor];
-        }
-    }
-
-    public Command raiseGoalHeightCommand() {
-        return run(() -> raiseGoalHeight());
-    }
-
-    public void lowerGoalHeight() {
-        if (currentFloor > bottomFloor) {
-            currentFloor--;
-            periodicGoalHeight = floorHeights[currentFloor];
-        }
-    }
-
-    public Command lowerGoalHeightCommand() {
-        return run(() -> lowerGoalHeight());
-    }
-
-    @Override
-    public void periodic() {
-        periodicMoveTo(periodicGoalHeight);
-        SmartDashboard.putNumber("Elevator Floor", currentFloor);
-        SmartDashboard.putNumber("Elevator Height", getHeightInches());
+    public Command goToBottom() {
+        return runOnce(() -> {reachHeight(0.0);});
     }
 } 

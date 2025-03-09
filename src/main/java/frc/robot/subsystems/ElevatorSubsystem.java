@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -83,16 +84,15 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorPid.setTolerance(ElevatorConstants.kElevatorTolerance);
     }
 
+    //calculated by taking the number of rotations of the motor and divding it by the gear ratio
+    //then multiply by the circumference of the sprocket using the pitch
+    //then times 2 and plus 1 to account for cascade and the second stage
     public double getHeightInches() {
         return (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
-        * (2 * Math.PI * ElevatorConstants.kSprocketPitch);
+        * (Math.PI * ElevatorConstants.kSprocketPitch) * 2 + 1;
     }
 
-    public double getVelocityInchesPerSecond() {
-        return ((elevatorEncoder.getVelocity() / 60) / ElevatorConstants.kElevatorGearing)
-        * (2 * Math.PI * ElevatorConstants.kSprocketPitch);
-    }
-
+    //called on the rising edge of the botoom limit switch
     public void handleBottomLimit() {
         elevatorMotor.set(0.0);
         elevatorEncoder.setPosition(0.0);
@@ -101,6 +101,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorPid.reset(0.0);
     }
 
+    //called when the elevator either travels to a position out of the min max extension
     public void handleOutOfBounds() {
         homedStatus = false;
         elevatorMotor.set(0.0);
@@ -124,22 +125,11 @@ public class ElevatorSubsystem extends SubsystemBase {
             return;
         }
 
+        //ensures target position is within the max and min extension
         targetPosition = MathUtil.clamp(height, ElevatorConstants.minExtension, ElevatorConstants.maxExtension);
     }
 
-    public void reachHeight(double height) {
-        double voltsOut = MathUtil.clamp(
-            elevatorPid.calculate(getHeightInches(), height) +
-            elevatorFeed.calculateWithVelocities(
-                elevatorPid.getSetpoint().velocity,
-                elevatorPid.getSetpoint().velocity
-            ),
-            -12, 12 
-        );
-
-        elevatorMotor.setVoltage(voltsOut);
-    }
-
+    //command to increase floor number if it is less than the top floor
     public Command incrementFloor() {
         return runOnce(() -> {
                 if (currentFloor < topFloor) {
@@ -149,6 +139,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         );
     }
 
+    //command to decrease floor number if it is greater than the bottom floor
     public Command decrementFloor() {
         return runOnce(() -> {
                 if (currentFloor > bottomFloor) {
@@ -158,22 +149,29 @@ public class ElevatorSubsystem extends SubsystemBase {
         );
     }
 
+    //command to set the target height to the current floor setpoint
     public Command goToCurrentFloor() {
         return runOnce(
             () -> {setHeightInches(floorHeights[currentFloor]);});
     }
 
+    //command to set the target height to the desired floor
     public Command goToFloor(int floor) {
         return runOnce(() -> {setHeightInches(floorHeights[floor]);});
     }
 
+    public double getCurrentFloor() {
+        return currentFloor;
+    }
+
+    //command to go to the bottom of the elevator
     public Command goToBottom() {
         return runOnce(() -> {setHeightInches(ElevatorConstants.minExtension);});
     }
 
+    //checks if the limit switch press is on the rising edge
     public boolean bottomLimitRising() {
         boolean currLimitVal = bottomTrigger.debounce(0.1).getAsBoolean();
-        
         if (currLimitVal && !previousLimitVal) {
             previousLimitVal = currLimitVal;
             return true;
@@ -182,17 +180,28 @@ public class ElevatorSubsystem extends SubsystemBase {
         return false;
     }
 
+    public void updateElevatorTelemetry() {
+        SmartDashboard.putNumber("Elevator Height", getHeightInches());
+        SmartDashboard.putNumber("Current Floor", getCurrentFloor());
+        SmartDashboard.putBoolean("Homed?", isHomed());
+        SmartDashboard.putBoolean("Bottom Limit", bottomLimitSwitch.get());
+    }
+
     @Override
     public void periodic() {
 
+        //handle bottom limit if the limit switch is pressed
         if (bottomLimitRising()) {
             handleBottomLimit();
         }
 
-        if (getHeightInches() >= ElevatorConstants.maxExtension) {
+        //handles out of bounds if the current height is not within max and min extension
+        if ((getHeightInches() >= ElevatorConstants.maxExtension) || (getHeightInches() <= ElevatorConstants.minExtension)) {
             handleOutOfBounds();
         }
 
+        //only runs elevator if it is homed by bottom limit switch
+        //no hold position needed because targetPosition achieves the same effect when in periodic()
         if (isHomed()) {
             double voltsOut = MathUtil.clamp(
                 elevatorPid.calculate(getHeightInches(), targetPosition) +
@@ -203,5 +212,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             );
             elevatorMotor.setVoltage(voltsOut);
         }
+    
     }
 } 

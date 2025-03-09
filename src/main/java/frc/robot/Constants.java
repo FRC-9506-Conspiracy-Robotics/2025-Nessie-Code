@@ -25,30 +25,31 @@ public final class Constants {
     }
 
     public static class ElevatorConstants {
+        //motion constants
         public static final double kElevatorGearing = 25;
-        public static final double kSprocketTeeth = 22;
         public static final double kSprocketPitch = 1.76;
-        public static final double kCarriageMass = 20;
+        //extension constants
         public static final double minExtension = 0;
-        public static final double maxExtension = 28; //for stage 1
+        public static final double maxExtension = 56;
         public static final double l2Setpoint = 24;
         public static final double l3Setpoint = 40;
         public static final double l4Setpoint = 55;
         public static final double intakeSetpoint = 12;
-
+        //pid constants
         public static final double kElevatorKp = 0.25;
         public static final double kElevatorKi = 0;
-        public static final double kElevatorKd = 0.0; //1;
-
+        public static final double kElevatorKd = 0.0;
+        //feedforward constants
         public static final double kElevatorkS = 0.25;
         public static final double kElevatorkV = 0.25;
         public static final double kElevatorkA = 0.00;
         public static final double kElevatorkG = 0.25;
-
+        //motion limits
         public static final double kMaxVelocity = 30;
         public static final double kMaxAccel = 100;
         public static final int kElevatorMaxCurrent = 40;
         public static final double kElevatorRampRate = 0.1;
+        //other constraints
         public static final double kElevatorTolerance = 1/16;
         public static final double kScoreDrop = 6;
     }
@@ -56,10 +57,10 @@ public final class Constants {
     //measurements in degrees, where rotating up/counterclockwise is positive
     public static class EndEffectorConstants {
         public static final double kIntakeSpeed = 0.2;
-        public static final double startingAngle = Units.degreesToRadians(90);
-        public static final double restingAngle = Units.degreesToRadians(30);
-        public static final double clearanceAngle = Units.degreesToRadians(55);
-        public static final double intakeAngle = Units.degreesToRadians(50);
+        public static final double startingAngle = Units.degreesToRotations(90);
+        public static final double restingAngle = Units.degreesToRotations(30);
+        public static final double clearanceAngle = Units.degreesToRotations(55);
+        public static final double intakeAngle = Units.degreesToRotations(50);
         public static final double kElbowGearing = 125;
 
         public static final double kMaxElbowVelocity = 1;

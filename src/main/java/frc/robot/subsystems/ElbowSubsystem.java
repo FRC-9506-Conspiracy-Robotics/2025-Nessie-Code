@@ -58,30 +58,6 @@ public class ElbowSubsystem extends SubsystemBase{
         return(elbowEncoder.getVelocity() / EndEffectorConstants.kElbowGearing) * Math.PI * 2 / 60;
     }
 
-    public Trigger resting =
-        new Trigger(() -> MathUtil.isNear(
-            getElbowAngleRad(),
-            EndEffectorConstants.restingAngle, 
-            5)
-        );
-
-    public Trigger atTop =
-        new Trigger (() -> MathUtil.isNear(
-            getElbowAngleRad(),
-            EndEffectorConstants.startingAngle,
-            5
-            )
-        );
-    
-    public Trigger atAngle(double angle, double tolerance){
-        return new Trigger (() -> MathUtil.isNear(
-                angle,
-                getElbowAngleRad(),
-                tolerance
-            )
-        );
-    }
-
     public void setZero() {
         elbowEncoder.setPosition(EndEffectorConstants.restingAngle);
     }
@@ -93,7 +69,8 @@ public class ElbowSubsystem extends SubsystemBase{
     public void elbowGoToAngle(double angleRad) {
         double voltsOut = MathUtil.clamp(
             elbowPid.calculate(getElbowAngleRad(), angleRad)
-            + elbowFeed.calculateWithVelocities(getElbowAngleRad(), elbowPid.getSetpoint().velocity, elbowPid.getSetpoint().velocity),
+            + elbowFeed.calculateWithVelocities(
+                getElbowAngleRad(), elbowPid.getSetpoint().velocity, elbowPid.getSetpoint().velocity),
             -12,
             12
         );

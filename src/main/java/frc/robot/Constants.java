@@ -49,7 +49,7 @@ public final class Constants {
         public static final double kMaxAccel = 100;
         public static final int kElevatorMaxCurrent = 40;
         public static final double kElevatorRampRate = 0.1;
-        public static final double kElevatorTolerance = 1/32;
+        public static final double kElevatorTolerance = 1/16;
         public static final double kScoreDrop = 6;
     }
 

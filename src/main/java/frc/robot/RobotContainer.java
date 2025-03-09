@@ -70,10 +70,10 @@ public class RobotContainer {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
 
-        mDriverController.povUp().onTrue(elevator.goingUpCommand());
-        mDriverController.povDown().onTrue(elevator.goingDownCommand());
-        mDriverController.y().onTrue(elevator.goToCurrentFloor());
-        mDriverController.x().onTrue(elevator.goToBottom());
+        mDriverController.povUp().onTrue(elevator.incrementFloor());
+        mDriverController.povDown().onTrue(elevator.decrementFloor());
+        mDriverController.y().toggleOnTrue(elevator.goToCurrentFloor());
+        mDriverController.y().toggleOnFalse(elevator.goToBottom());
     }
 
     public Command getAutonomousCommand() {

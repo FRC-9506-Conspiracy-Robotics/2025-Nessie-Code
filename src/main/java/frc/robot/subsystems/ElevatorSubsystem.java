@@ -36,7 +36,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         ElevatorConstants.minExtension, 
         ElevatorConstants.l2Setpoint, 
         ElevatorConstants.l3Setpoint, 
-        ElevatorConstants.l4Setpoint
+        ElevatorConstants.l4Setpoint,
+        ElevatorConstants.intakeSetpoint
     };
 
     //intitalize relative encoder based on the main motor

@@ -66,6 +66,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
+        elbow.setZero();
     }
 
     private void configureBindings() {
@@ -81,19 +82,25 @@ public class RobotContainer {
         mDriverController.povDown().onTrue(elevator.decrementFloor());
         mDriverController.y().toggleOnTrue(elevator.goToCurrentFloor());
         mDriverController.y().toggleOnFalse(elevator.goToBottom());
-        
-        mDriverController.a()
+        mDriverController.a().onTrue(
+            claw.setWristAngle(EndEffectorConstants.wristVerticalAngle)
+            .alongWith(Commands.waitSeconds(2.0).andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))));
+        mDriverController.b().onTrue(elbow.setElbowAngle(EndEffectorConstants.restingAngle)
+            .alongWith(claw.setWristAngle((EndEffectorConstants.wristHorizontalAngle))));
+        mDriverController.x().onTrue(elbow.resetZero());
+
+        /**mDriverController.a()
             .toggleOnTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle)
             .andThen(elevator.goToFloor(4))
             .alongWith(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
-            .alongWith(claw.runIntake())
+            // .alongWith(claw.runIntake())
         );
         mDriverController.a()
             .toggleOnFalse(claw.stopIntake()
             .alongWith(elbow.setElbowAngle(EndEffectorConstants.clearanceAngle))
-            .alongWith(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle))
+            // .alongWith(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle))
             .andThen(elevator.goToBottom())
-        );
+        );*/
     }
 
     public Command getAutonomousCommand() {

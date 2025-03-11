@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -45,7 +46,7 @@ public class ElbowSubsystem extends SubsystemBase{
         config.idleMode(IdleMode.kCoast)
         .smartCurrentLimit(EndEffectorConstants.kElbowCurrentLimit)
         .closedLoopRampRate(0) 
-        .inverted(true);
+        .inverted(false);
 
         elbowMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -59,11 +60,19 @@ public class ElbowSubsystem extends SubsystemBase{
     }
 
     public void setZero() {
-        elbowEncoder.setPosition(EndEffectorConstants.restingAngle);
+        System.out.println("Setting encoder position");
+        var err = elbowEncoder.setPosition(0.25 * EndEffectorConstants.kElbowGearing);
+        if (err != REVLibError.kOk) {
+            System.out.println("Got an error setting position");
+            System.out.println(err);
+        } else {
+            System.out.println("Successful encoder set");
+        }
+        System.out.println("New position " + getElbowAngleRad() * 180 / Math.PI);
     }
 
     public Command resetZero() {
-        return run(() -> setZero());
+        return runOnce(() -> setZero());
     }
 
     public void elbowGoToAngle(double angleRad) {
@@ -82,9 +91,7 @@ public class ElbowSubsystem extends SubsystemBase{
         return run(() -> {
                 elbowGoToAngle(angleInRad); 
 
-                if (!(elbowPid.getSetpoint().velocity == 0))  {
-                System.out.println("Elbow Position: " + getElbowAngleRad());
-                }
+                System.out.println("Elbow Position: " + getElbowAngleRad() * 180.0 / Math.PI);
             }
         );
     }

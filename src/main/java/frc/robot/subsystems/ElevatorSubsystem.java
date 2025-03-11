@@ -63,7 +63,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorkA
         );
 
-    Trigger bottomTrigger = new Trigger(() -> bottomLimitSwitch.get());
+    Trigger bottomTrigger = new Trigger(() -> bottomLimitSwitch.get()).debounce(0.1);
 
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
@@ -99,6 +99,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         homedStatus = true;
         targetPosition = 0.0;
         elevatorPid.reset(0.0);
+        System.out.println("Elevator homed");
     }
 
     //called when the elevator either travels to a position out of the min max extension
@@ -122,6 +123,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void setHeightInches(double height) {
         if (!homedStatus && height > 0) {
             System.out.println("WARNING: Elevator not homed");
+            System.out.println("Current elevator position: " + getHeightInches());
+            System.out.println("Limit switch status " + bottomTrigger.getAsBoolean());
             return;
         }
 
@@ -171,7 +174,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     //checks if the limit switch press is on the rising edge
     public boolean bottomLimitRising() {
-        boolean currLimitVal = bottomTrigger.debounce(0.1).getAsBoolean();
+        boolean currLimitVal = bottomTrigger.getAsBoolean();
         if (currLimitVal && !previousLimitVal) {
             previousLimitVal = currLimitVal;
             return true;
@@ -202,6 +205,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         //only runs elevator if it is homed by bottom limit switch
         //no hold position needed because targetPosition achieves the same effect when in periodic()
+        setHeightInches(floorHeights[currentFloor]);
         if (isHomed()) {
             double voltsOut = MathUtil.clamp(
                 elevatorPid.calculate(getHeightInches(), targetPosition) +

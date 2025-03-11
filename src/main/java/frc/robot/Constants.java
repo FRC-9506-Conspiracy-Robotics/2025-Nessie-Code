@@ -57,10 +57,9 @@ public final class Constants {
     //measurements in degrees, where rotating up/counterclockwise is positive
     public static class EndEffectorConstants {
         public static final double kIntakeSpeed = 0.2;
-        public static final double startingAngle = Units.degreesToRotations(90);
-        public static final double restingAngle = Units.degreesToRotations(30);
-        public static final double clearanceAngle = Units.degreesToRotations(55);
-        public static final double intakeAngle = Units.degreesToRotations(50);
+        public static final double startingAngle = Units.degreesToRadians(90);
+        public static final double restingAngle = Units.degreesToRadians(30);
+        public static final double intakeAngle = Units.degreesToRadians(80);
         public static final double kElbowGearing = 125;
 
         public static final double kMaxElbowVelocity = 1;

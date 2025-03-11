@@ -81,8 +81,10 @@ public class RobotContainer {
         mDriverController.povDown().onTrue(elevator.decrementFloor());
         mDriverController.y().toggleOnTrue(elevator.goToCurrentFloor());
         mDriverController.y().toggleOnFalse(elevator.goToBottom());
-        mDriverController.a().toggleOnTrue(elbow.goToIntakePos().andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle)).andThen(elevator.setFloor(4)).andThen(claw.runIntake()));
-        mDriverController.a().toggleOnFalse(claw.stopIntakeCommand().andThen(elevator.setFloor(0)));
+        mDriverController.b().toggleOnTrue(elbow.goToIntakePos().andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle)).andThen(elevator.setFloor(4)).andThen(claw.runIntake()));
+        mDriverController.b().toggleOnFalse(claw.stopIntakeCommand().andThen(elevator.setFloor(0)));
+        mDriverController.a().onTrue(elevator.scoreL2L3());
+        mDriverController.x().onTrue(claw.reverseIntake());
 
         /**mDriverController.a()
             .toggleOnTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle)

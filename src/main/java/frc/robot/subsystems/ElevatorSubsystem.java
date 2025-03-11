@@ -176,6 +176,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         return runOnce(() -> {setHeightInches(ElevatorConstants.minExtension);});
     }
 
+    public void reduceHeight() {
+        targetPosition = targetPosition - ElevatorConstants.kScoreDrop;
+    }
+
+    public Command scoreL2L3() {
+        return runOnce(() -> reduceHeight());
+    }
+
     //checks if the limit switch press is on the rising edge
     public boolean bottomLimitRising() {
         boolean currLimitVal = bottomTrigger.getAsBoolean();
@@ -209,7 +217,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         //only runs elevator if it is homed by bottom limit switch
         //no hold position needed because targetPosition achieves the same effect when in periodic()
-        setHeightInches(floorHeights[currentFloor]);
         if (isHomed()) {
             double voltsOut = MathUtil.clamp(
                 elevatorPid.calculate(getHeightInches(), targetPosition) +

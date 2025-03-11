@@ -76,8 +76,8 @@ public final class Constants {
         public static final double kElbowkA = 0.0;
         public static final double kElbowkG = 0.1;
 
-        public static final double wristHorizontalAngle = 0;
-        public static final double wristVerticalAngle = 90;
+        public static final double wristHorizontalAngle = Units.degreesToRadians(0);
+        public static final double wristVerticalAngle = Units.degreesToRadians(90);
         public static final double kWristGearing = 16;
 
         public static final double kMaxWristVelocity = 2;

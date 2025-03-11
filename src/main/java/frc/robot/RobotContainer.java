@@ -82,7 +82,7 @@ public class RobotContainer {
         mDriverController.y().toggleOnTrue(elevator.goToCurrentFloor());
         mDriverController.y().toggleOnFalse(elevator.goToBottom());
         mDriverController.a().toggleOnTrue(elbow.goToIntakePos().andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle)).andThen(elevator.setFloor(4)).andThen(claw.runIntake()));
-        mDriverController.a().toggleOnFalse(claw.stopIntake().andThen(elevator.setFloor(0)));
+        mDriverController.a().toggleOnFalse(claw.stopIntakeCommand().andThen(elevator.setFloor(0)));
 
         /**mDriverController.a()
             .toggleOnTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle)

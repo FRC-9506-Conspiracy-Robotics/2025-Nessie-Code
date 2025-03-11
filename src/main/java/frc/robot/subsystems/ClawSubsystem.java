@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -55,6 +56,7 @@ public class ClawSubsystem extends SubsystemBase{
         .inverted(false);
 
         wristMotor.configure(wristConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+        wristEncoder.setPosition(Units.radiansToRotations(EndEffectorConstants.wristHorizontalAngle));
 
         SparkMaxConfig intakeConfig = new SparkMaxConfig();
         intakeConfig.idleMode(IdleMode.kBrake)
@@ -92,12 +94,12 @@ public class ClawSubsystem extends SubsystemBase{
         );
     }
 
-    public void stop() {
+    public void stopIntake() {
         intakeMotor.set(0.0);
     }
 
-    public Command stopIntake() {
-        return run(() -> stop());
+    public Command stopIntakeCommand() {
+        return run(() -> stopIntake());
     }
 
     public void setZero() {
@@ -144,5 +146,10 @@ public class ClawSubsystem extends SubsystemBase{
                 System.out.println("Position: " + getWristAngleRad());
             }
         );
+    }
+
+    @Override
+    public void periodic() {
+        
     }
 }

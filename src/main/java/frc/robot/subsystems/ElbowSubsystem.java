@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -45,7 +46,7 @@ public class ElbowSubsystem extends SubsystemBase{
         config.idleMode(IdleMode.kCoast)
         .smartCurrentLimit(EndEffectorConstants.kElbowCurrentLimit)
         .closedLoopRampRate(0) 
-        .inverted(true);
+        .inverted(false);
 
         elbowMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -58,42 +59,21 @@ public class ElbowSubsystem extends SubsystemBase{
         return(elbowEncoder.getVelocity() / EndEffectorConstants.kElbowGearing) * Math.PI * 2 / 60;
     }
 
-    public Trigger resting =
-        new Trigger(() -> MathUtil.isNear(
-            getElbowAngleRad(),
-            EndEffectorConstants.restingAngle, 
-            5)
-        );
-
-    public Trigger atTop =
-        new Trigger (() -> MathUtil.isNear(
-            getElbowAngleRad(),
-            EndEffectorConstants.startingAngle,
-            5
-            )
-        );
-    
-    public Trigger atAngle(double angle, double tolerance){
-        return new Trigger (() -> MathUtil.isNear(
-                angle,
-                getElbowAngleRad(),
-                tolerance
-            )
-        );
-    }
-
     public void setZero() {
-        elbowEncoder.setPosition(EndEffectorConstants.restingAngle);
+        System.out.println("Setting encoder position");
+        elbowEncoder.setPosition(0.25 * EndEffectorConstants.kElbowGearing);
+        System.out.println("New position " + getElbowAngleRad() * 180 / Math.PI);
     }
 
     public Command resetZero() {
-        return run(() -> setZero());
+        return runOnce(() -> setZero());
     }
 
     public void elbowGoToAngle(double angleRad) {
         double voltsOut = MathUtil.clamp(
             elbowPid.calculate(getElbowAngleRad(), angleRad)
-            + elbowFeed.calculateWithVelocities(getElbowAngleRad(), elbowPid.getSetpoint().velocity, elbowPid.getSetpoint().velocity),
+            + elbowFeed.calculateWithVelocities(
+                getElbowAngleRad(), elbowPid.getSetpoint().velocity, elbowPid.getSetpoint().velocity),
             -12,
             12
         );
@@ -105,9 +85,7 @@ public class ElbowSubsystem extends SubsystemBase{
         return run(() -> {
                 elbowGoToAngle(angleInRad); 
 
-                if (!(elbowPid.getSetpoint().velocity == 0))  {
-                System.out.println("Elbow Position: " + getElbowAngleRad());
-                }
+                System.out.println("Elbow Position: " + getElbowAngleRad() * 180.0 / Math.PI);
             }
         );
     }

@@ -12,6 +12,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,11 +24,22 @@ public class ElevatorSubsystem extends SubsystemBase {
     //intialize motors
     private final SparkMax elevatorMotor = new SparkMax(CanId.elevatorMotorCan, MotorType.kBrushless);
     private final SparkMax elevatorFollower = new SparkMax(CanId.elevatorFollowerCan, MotorType.kBrushless);
+    
+    private final DigitalInput bottomLimitSwitch = new DigitalInput(0);
+    private boolean homedStatus = false;
+    private boolean previousLimitVal = false;
+
+    private double targetPosition;
     private int currentFloor = 0;
     private final int bottomFloor = 0;
     private final int topFloor = 3;
-    private final double[] floorHeights = {0.0, ElevatorConstants.l2Setpoint, ElevatorConstants.l3Setpoint, ElevatorConstants.l4Setpoint};
-
+    private final double[] floorHeights = {
+        ElevatorConstants.minExtension, 
+        ElevatorConstants.l2Setpoint, 
+        ElevatorConstants.l3Setpoint, 
+        ElevatorConstants.l4Setpoint,
+        ElevatorConstants.intakeSetpoint
+    };
 
     //intitalize relative encoder based on the main motor
     private final RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
@@ -51,34 +63,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConstants.kElevatorkA
         );
 
-    public final Trigger minStop = 
-        new Trigger(() -> MathUtil.isNear(
-            getHeightInches(),
-            ElevatorConstants.minExtension,
-            1
-            )
-        );
-    
-    public final Trigger maxStop = 
-        new Trigger(() -> MathUtil.isNear(
-            getHeightInches(),
-            ElevatorConstants.maxExtension,
-            0.1
-            )
-        );
-
-    public Command minStopWarning() {
-        return run(() -> {
-            System.out.println("ELEVATOR NEAR BOTTOM");
-        });
-    }
-
-    public Command maxStopCommand() {
-        return run(() -> {
-            stopElevator();
-            System.out.println("ELEVATOR NEAR TOP");
-        });
-    }
+    Trigger bottomTrigger = new Trigger(() -> bottomLimitSwitch.get()).debounce(0.1);
 
     public ElevatorSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
@@ -95,123 +80,142 @@ public class ElevatorSubsystem extends SubsystemBase {
         .follow(elevatorMotor, true);
 
         elevatorFollower.configure(followerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+
+        elevatorPid.setTolerance(ElevatorConstants.kElevatorTolerance);
     }
 
+    //calculated by taking the number of rotations of the motor and divding it by the gear ratio
+    //then multiply by the circumference of the sprocket using the pitch
+    //then times 2 and plus 1 to account for cascade and the second stage
     public double getHeightInches() {
-        return 
-        (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
-        * (2 * Math.PI * ElevatorConstants.kSprocketPitch);
+        return (elevatorEncoder.getPosition() / ElevatorConstants.kElevatorGearing)
+        * (Math.PI * ElevatorConstants.kSprocketPitch) * 2 + 1;
     }
 
-    public double getVelocityInchesPerSecond() {
-        return ((elevatorEncoder.getVelocity() / 60) / ElevatorConstants.kElevatorGearing)
-        * (2 * Math.PI * ElevatorConstants.kSprocketPitch);
-    }
-
-    public void reachHeight(double height) {
-        double voltsOut = MathUtil.clamp(
-            elevatorPid.calculate(getHeightInches(), height) +
-            elevatorFeed.calculateWithVelocities(
-                elevatorPid.getSetpoint().velocity,
-                elevatorPid.getSetpoint().velocity
-            ),
-            -12, 12 
-        );
-
-        elevatorMotor.setVoltage(voltsOut);
-    }
-
-    public Command setHeight(double height) {
-        return run(() -> {
-            reachHeight(height);
-            System.out.println("Elevator Position: " + getHeightInches());
-            System.out.println("Velocity SP is " + elevatorPid.getSetpoint().velocity);
-        });
-    }
-
-    public void stop() {
+    //called on the rising edge of the botoom limit switch
+    public void handleBottomLimit() {
         elevatorMotor.set(0.0);
-    }
-
-    public Command stopElevator() {
-        return runOnce(() -> {
-            stop();
-        });
-    }
-
-    public void zero() {
         elevatorEncoder.setPosition(0.0);
+        homedStatus = true;
+        targetPosition = 0.0;
+        elevatorPid.reset(0.0);
+        System.out.println("Elevator homed");
     }
 
-    public Command zeroElevator() {
+    //called when the elevator either travels to a position out of the min max extension
+    public void handleOutOfBounds() {
+        homedStatus = false;
+        elevatorMotor.set(0.0);
+        homeElevator();
+    }
+
+    public void homeElevator() {
+        elevatorMotor.set(-0.1);
+        if (bottomLimitSwitch.get()) {
+            handleBottomLimit();
+        }
+    }
+
+    public boolean isHomed() {
+        return homedStatus;
+    }
+
+    public void setHeightInches(double height) {
+        if (!homedStatus && height > 0) {
+            System.out.println("WARNING: Elevator not homed");
+            System.out.println("Current elevator position: " + getHeightInches());
+            System.out.println("Limit switch status " + bottomTrigger.getAsBoolean());
+            return;
+        }
+
+        //ensures target position is within the max and min extension
+        targetPosition = MathUtil.clamp(height, ElevatorConstants.minExtension, ElevatorConstants.maxExtension);
+    }
+
+    //command to increase floor number if it is less than the top floor
+    public Command incrementFloor() {
         return runOnce(() -> {
-            zero();
-            System.out.println("Zeroing.");
-        });
-    }
-
-    public boolean aroundHeight(double height, double tolerance) {
-        return MathUtil.isNear(
-            height, 
-            getHeightInches(), 
-            ElevatorConstants.kElevatorTolerance
+                if (currentFloor < topFloor) {
+                  currentFloor++;
+                }
+            }
         );
     }
 
-    private double holdPoint = 0;
-    public Command holdPosition(boolean holdCurrentPosition) {
-        return startRun(
-            () -> {
-                if (holdCurrentPosition) {
-                    holdPoint = getHeightInches();
-                    elevatorPid.reset(holdPoint);
-                } else {
-                    holdPoint = floorHeights[currentFloor];
+    //command to decrease floor number if it is greater than the bottom floor
+    public Command decrementFloor() {
+        return runOnce(() -> {
+                if (currentFloor > bottomFloor) {
+                    currentFloor--;
                 }
-                System.out.println("Holding at " + holdPoint);
-            },
-            () -> {
-                reachHeight(holdPoint);
-                var velSP = elevatorPid.getSetpoint().velocity;
-                if (Math.abs(velSP) > 0.0) {
-                    System.out.println("Holding: " + holdPoint);
-                    System.out.println("Elevator Position: " + getHeightInches());
-                    System.out.println("Velocity SP is " + elevatorPid.getSetpoint().velocity);
-                }
-                
             }
-        ).withTimeout(1.5);
+        );
     }
 
-    public Command goUpOneFloor() {
-        return runOnce(() -> {
-            if (currentFloor < topFloor) {
-                currentFloor++;
-            }
-            reachHeight(floorHeights[currentFloor]);
-            System.out.println("Going up.");
-        });
+    //command to set the target height to the current floor setpoint
+    public Command goToCurrentFloor() {
+        return runOnce(
+            () -> {setHeightInches(floorHeights[currentFloor]);});
     }
 
-    public Command goDownOneFloor() {
-        return runOnce(() -> {
-            if (currentFloor > bottomFloor) {
-                currentFloor--;
-            }
-            reachHeight(floorHeights[currentFloor]);
-            System.out.println("Going down");
-        });
+    //command to set the target height to the desired floor
+    public Command goToFloor(int floor) {
+        return runOnce(() -> {setHeightInches(floorHeights[floor]);});
     }
 
-    public Command goToFloor(int targetFloor) {
-        return runOnce(() -> {
-            currentFloor = targetFloor;
-        });
+    public double getCurrentFloor() {
+        return currentFloor;
+    }
+
+    //command to go to the bottom of the elevator
+    public Command goToBottom() {
+        return runOnce(() -> {setHeightInches(ElevatorConstants.minExtension);});
+    }
+
+    //checks if the limit switch press is on the rising edge
+    public boolean bottomLimitRising() {
+        boolean currLimitVal = bottomTrigger.getAsBoolean();
+        if (currLimitVal && !previousLimitVal) {
+            previousLimitVal = currLimitVal;
+            return true;
+        }
+        previousLimitVal = currLimitVal;
+        return false;
+    }
+
+    public void updateElevatorTelemetry() {
+        SmartDashboard.putNumber("Elevator Height", getHeightInches());
+        SmartDashboard.putNumber("Current Floor", getCurrentFloor());
+        SmartDashboard.putBoolean("Homed?", isHomed());
+        SmartDashboard.putBoolean("Bottom Limit", bottomLimitSwitch.get());
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Elevator Floor", currentFloor);
-        SmartDashboard.putNumber("Elevator Height", getHeightInches());
+
+        //handle bottom limit if the limit switch is pressed
+        if (bottomLimitRising()) {
+            handleBottomLimit();
+        }
+
+        //handles out of bounds if the current height is not within max and min extension
+        if ((getHeightInches() >= ElevatorConstants.maxExtension) || (getHeightInches() <= ElevatorConstants.minExtension)) {
+            handleOutOfBounds();
+        }
+
+        //only runs elevator if it is homed by bottom limit switch
+        //no hold position needed because targetPosition achieves the same effect when in periodic()
+        setHeightInches(floorHeights[currentFloor]);
+        if (isHomed()) {
+            double voltsOut = MathUtil.clamp(
+                elevatorPid.calculate(getHeightInches(), targetPosition) +
+                elevatorFeed.calculate(
+                    elevatorPid.getSetpoint().velocity
+                ),
+                -12, 12 
+            );
+            elevatorMotor.setVoltage(voltsOut);
+        }
+    
     }
-}
+} 

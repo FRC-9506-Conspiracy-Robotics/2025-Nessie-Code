@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import javax.xml.stream.events.EndDocument;
 
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -103,7 +104,14 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
     public void setZero() {
-        wristEncoder.setPosition(EndEffectorConstants.wristVerticalAngle);
+        System.out.println("Setting encoder position");
+        wristEncoder.setPosition((EndEffectorConstants.wristHorizontalAngle) / 360 * EndEffectorConstants.kWristGearing);
+        System.out.println("New position " + getWristAngleRad() * 180 / Math.PI);
+
+    }
+
+    public Command resetZero() {
+        return runOnce(() -> setZero());
     }
 
     public void wristGoToAngle(double angleRad) {
@@ -128,7 +136,7 @@ public class ClawSubsystem extends SubsystemBase{
     public Command setWristAngle(double angleInRad) {
         return run(() -> {
                 wristGoToAngle(angleInRad);
-                System.out.println("Wrist Position: " + getWristAngleRad());
+                System.out.println("Wrist Position: " + (getWristAngleRad() * 180 / Math.PI));
             }
         );
     }

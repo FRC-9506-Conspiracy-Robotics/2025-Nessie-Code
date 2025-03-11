@@ -61,13 +61,7 @@ public class ElbowSubsystem extends SubsystemBase{
 
     public void setZero() {
         System.out.println("Setting encoder position");
-        var err = elbowEncoder.setPosition(0.25 * EndEffectorConstants.kElbowGearing);
-        if (err != REVLibError.kOk) {
-            System.out.println("Got an error setting position");
-            System.out.println(err);
-        } else {
-            System.out.println("Successful encoder set");
-        }
+        elbowEncoder.setPosition(0.25 * EndEffectorConstants.kElbowGearing);
         System.out.println("New position " + getElbowAngleRad() * 180 / Math.PI);
     }
 

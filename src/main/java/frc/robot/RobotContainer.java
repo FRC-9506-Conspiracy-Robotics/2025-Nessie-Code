@@ -82,12 +82,22 @@ public class RobotContainer {
         mDriverController.povDown().onTrue(elevator.decrementFloor());
         mDriverController.y().toggleOnTrue(elevator.goToCurrentFloor());
         mDriverController.y().toggleOnFalse(elevator.goToBottom());
-        mDriverController.a().onTrue(
-            claw.setWristAngle(EndEffectorConstants.wristVerticalAngle)
-            .alongWith(Commands.waitSeconds(2.0).andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))));
-        mDriverController.b().onTrue(elbow.setElbowAngle(EndEffectorConstants.restingAngle)
-            .alongWith(claw.setWristAngle((EndEffectorConstants.wristHorizontalAngle))));
-        mDriverController.x().onTrue(elbow.resetZero());
+        //mDriverController.a().onTrue(
+            //claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
+             //.alongWith(Commands.waitSeconds(2.0).andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))));
+        //mDriverController.b().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
+            //.alongWith(claw.setWristAngle((EndEffectorConstants.wristHorizontalAngle))));
+            
+        mDriverController.a().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
+
+        mDriverController.leftBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
+        mDriverController.rightBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
+        mDriverController.povLeft().onTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
+        mDriverController.povRight().onTrue(elbow.setElbowAngle(EndEffectorConstants.restingAngle));
+        mDriverController.b().toggleOnTrue(claw.runIntake());
+        mDriverController.x().toggleOnTrue(claw.reverseIntake());
+
+
 
         /**mDriverController.a()
             .toggleOnTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle)

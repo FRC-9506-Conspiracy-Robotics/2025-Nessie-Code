@@ -66,7 +66,6 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
-        elbow.setZero();
     }
 
     private void configureBindings() {
@@ -82,12 +81,8 @@ public class RobotContainer {
         mDriverController.povDown().onTrue(elevator.decrementFloor());
         mDriverController.y().toggleOnTrue(elevator.goToCurrentFloor());
         mDriverController.y().toggleOnFalse(elevator.goToBottom());
-        mDriverController.a().onTrue(
-            claw.setWristAngle(EndEffectorConstants.wristVerticalAngle)
-            .alongWith(Commands.waitSeconds(2.0).andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))));
-        mDriverController.b().onTrue(elbow.setElbowAngle(EndEffectorConstants.restingAngle)
-            .alongWith(claw.setWristAngle((EndEffectorConstants.wristHorizontalAngle))));
-        mDriverController.x().onTrue(elbow.resetZero());
+        mDriverController.a().toggleOnTrue(elbow.goToIntakePos().andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle)).andThen(elevator.setFloor(4)).andThen(claw.runIntake()));
+        mDriverController.a().toggleOnFalse(claw.stopIntake().andThen(elevator.setFloor(0)));
 
         /**mDriverController.a()
             .toggleOnTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle)

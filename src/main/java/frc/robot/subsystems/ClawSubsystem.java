@@ -14,6 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanId;
@@ -22,6 +23,8 @@ import frc.robot.Constants.EndEffectorConstants;
 public class ClawSubsystem extends SubsystemBase{
     private final SparkMax intakeMotor = new SparkMax(CanId.intakeMotorCan, MotorType.kBrushless);
     private final SparkMax intakeFollower = new SparkMax(CanId.intakeFollowerCan, MotorType.kBrushless);
+
+    private final DigitalInput coralSwitch = new DigitalInput(2);
 
     private final SparkMax wristMotor = new SparkMax(CanId.wristMotorCan, MotorType.kBrushless);
     private final RelativeEncoder wristEncoder = wristMotor.getEncoder();
@@ -45,7 +48,6 @@ public class ClawSubsystem extends SubsystemBase{
         );
     
     public ClawSubsystem() {
-
         SparkMaxConfig wristConfig = new SparkMaxConfig();
         wristConfig.idleMode(IdleMode.kCoast)
         .smartCurrentLimit(EndEffectorConstants.kWristCurrentLimit)
@@ -105,7 +107,7 @@ public class ClawSubsystem extends SubsystemBase{
     public void wristGoToAngle(double angleRad) {
         double voltsOut = MathUtil.clamp(
             wristPid.calculate(getWristAngleRad(), angleRad)
-            + wristFeed.calculateWithVelocities(getWristAngleRad(), wristPid.getSetpoint().velocity, wristPid.getSetpoint().velocity),
+            + wristFeed.calculate(getWristAngleRad(), wristPid.getSetpoint().velocity),
             -12,
             12
         );

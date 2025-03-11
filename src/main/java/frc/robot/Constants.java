@@ -58,7 +58,7 @@ public final class Constants {
     public static class EndEffectorConstants {
         public static final double kIntakeSpeed = 0.2;
         public static final double startingAngle = Units.degreesToRadians(90);
-        public static final double restingAngle = Units.degreesToRadians(30);
+        public static final double restingAngle = Units.degreesToRadians(35);
         public static final double intakeAngle = Units.degreesToRadians(80);
         public static final double kElbowGearing = 125;
 

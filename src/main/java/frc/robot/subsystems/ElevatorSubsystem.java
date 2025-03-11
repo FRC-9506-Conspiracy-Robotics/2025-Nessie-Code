@@ -111,7 +111,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void homeElevator() {
         elevatorMotor.set(-0.1);
-        if (bottomLimitSwitch.get()) {
+        if (bottomLimitRising()) {
             handleBottomLimit();
         }
     }
@@ -161,6 +161,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     //command to set the target height to the desired floor
     public Command goToFloor(int floor) {
         return runOnce(() -> {setHeightInches(floorHeights[floor]);});
+    }
+
+    public Command setFloor(int floor) {
+        return runOnce(() -> {currentFloor = floor;});
     }
 
     public double getCurrentFloor() {
@@ -216,6 +220,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             );
             elevatorMotor.setVoltage(voltsOut);
         }
-    
+        updateElevatorTelemetry();
     }
 } 

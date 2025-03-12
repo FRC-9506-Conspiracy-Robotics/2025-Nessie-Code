@@ -21,9 +21,6 @@ import frc.robot.Constants.CanId;
 import frc.robot.Constants.EndEffectorConstants;
 
 public class ClawSubsystem extends SubsystemBase{
-    private final SparkMax intakeMotor = new SparkMax(CanId.intakeMotorCan, MotorType.kBrushless);
-    private final SparkMax intakeFollower = new SparkMax(CanId.intakeFollowerCan, MotorType.kBrushless);
-
     private final SparkMax wristMotor = new SparkMax(CanId.wristMotorCan, MotorType.kBrushless);
     private final RelativeEncoder wristEncoder = wristMotor.getEncoder();
 
@@ -54,49 +51,6 @@ public class ClawSubsystem extends SubsystemBase{
         .inverted(false);
 
         wristMotor.configure(wristConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-
-        SparkMaxConfig intakeConfig = new SparkMaxConfig();
-        intakeConfig.idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(EndEffectorConstants.kWristCurrentLimit)
-        .closedLoopRampRate(0);
-        
-        intakeMotor.configure(intakeConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-
-        SparkMaxConfig intakeFollowerConfig = new SparkMaxConfig();
-        intakeFollowerConfig.idleMode(IdleMode.kBrake)
-        .follow(CanId.intakeMotorCan, true);
-
-        intakeFollower.configure(intakeFollowerConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-    }
-
-    public Command runIntake() {
-        return startEnd(
-            () -> {
-                intakeMotor.set(EndEffectorConstants.kIntakeSpeed);
-            },
-            () -> {
-                intakeMotor.set(0);
-            }
-        );
-    }
-
-    public Command reverseIntake() {
-        return startEnd(
-            () -> {
-                intakeMotor.set(-EndEffectorConstants.kIntakeSpeed);
-            },
-            () -> {
-                intakeMotor.set(0);
-            }
-        );
-    }
-
-    public void stop() {
-        intakeMotor.set(0.0);
-    }
-
-    public Command stopIntake() {
-        return run(() -> stop());
     }
 
     public void setZero() {

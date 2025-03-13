@@ -35,8 +35,8 @@ public class WristSubsystem extends SubsystemBase{
             EndEffectorConstants.kWristKi,
             EndEffectorConstants.kWristKd,
             new Constraints(
-                EndEffectorConstants.kMaxElbowVelocity,
-                EndEffectorConstants.kMaxElbowAccel
+                EndEffectorConstants.kMaxWristVelocity,
+                EndEffectorConstants.kMaxWristAccel
             )
         );
 
@@ -64,11 +64,12 @@ public class WristSubsystem extends SubsystemBase{
     }
 
     public void setAngleRad(double Radian) {
-        targetRad = MathUtil.clamp(Radian, EndEffectorConstants.wristHorizontalAngle, EndEffectorConstants.wristVerticalAngle);
+        targetRad = Radian;//MathUtil.clamp(Radian, EndEffectorConstants.wristHorizontalAngle, EndEffectorConstants.wristVerticalAngle + 0.001);
     }
 
     public Command setTargetRad(double Radian) {
-        return run(() -> {setAngleRad(Radian);});
+        return runOnce(() -> {setAngleRad(Radian);
+        System.out.println("set angle" + Radian);});
     }
 
     @Override
@@ -82,6 +83,7 @@ public class WristSubsystem extends SubsystemBase{
                 ),
                 -12, 12 
             );
-            wristMotor.setVoltage(voltsOut);
+        wristMotor.setVoltage(voltsOut);
+        SmartDashboard.putNumber("Wirst vOut", voltsOut);
     }
 }

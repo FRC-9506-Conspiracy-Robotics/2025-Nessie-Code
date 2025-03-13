@@ -25,6 +25,8 @@ import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 //import frc.robot.subsystems.RGBSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.WristSubsystem;
+
 import java.io.File;
 import swervelib.SwerveInputStream;
 
@@ -32,8 +34,9 @@ public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
-    private final ElbowSubsystem elbow = new ElbowSubsystem();
-    private final ClawSubsystem claw = new ClawSubsystem();
+    //private final ElbowSubsystem elbow = new ElbowSubsystem();
+    //private final ClawSubsystem claw = new ClawSubsystem();
+    private final WristSubsystem wrist = new WristSubsystem();
 //    private final RGBSubsystem rgb = new RGBSubsystem();
 
     //converts controller inputs to swerveinputstream type for field oriented
@@ -66,7 +69,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
-        elbow.setZero();
+        //elbow.setZero();
     }
 
     private void configureBindings() {
@@ -88,14 +91,14 @@ public class RobotContainer {
         //mDriverController.b().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
             //.alongWith(claw.setWristAngle((EndEffectorConstants.wristHorizontalAngle))));
             
-        mDriverController.a().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
+        //mDriverController.a().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
 
-        mDriverController.leftBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
-        mDriverController.rightBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
-        mDriverController.povLeft().onTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
-        mDriverController.povRight().onTrue(elbow.setElbowAngle(EndEffectorConstants.restingAngle));
-        mDriverController.b().toggleOnTrue(claw.runIntake());
-        mDriverController.x().toggleOnTrue(claw.reverseIntake());
+        mDriverController.leftBumper().onTrue(wrist.setTargetRad(EndEffectorConstants.wristHorizontalAngle));
+        mDriverController.rightBumper().onTrue(wrist.setTargetRad(EndEffectorConstants.wristVerticalAngle));
+        //mDriverController.povLeft().onTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
+        //mDriverController.povRight().onTrue(elbow.setElbowAngle(EndEffectorConstants.restingAngle));
+        //mDriverController.b().toggleOnTrue(claw.runIntake());
+        //mDriverController.x().toggleOnTrue(claw.reverseIntake());
 
 
 

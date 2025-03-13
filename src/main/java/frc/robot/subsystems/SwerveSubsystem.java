@@ -63,22 +63,6 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.setCosineCompensator(false);
         swerveDrive.setAngularVelocityCompensation(true, true, -0.13); //corrects for skew that occurs as angular velocity increases, tune this
         swerveDrive.setModuleEncoderAutoSynchronize(false, 1); //enable to resync encoders when swerve is not moving
-    }
-
-    //constructs swerve drive using parameter configs (field centric or not, controller or keyboard, etc)
-    public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
-        swerveDrive = new SwerveDrive(
-            driveCfg, 
-            controllerCfg, 
-            Constants.SwerveConstants.maxSpeed, 
-            new Pose2d(
-                new Translation2d(
-                    Meter.of(2), 
-                    Meter.of(0)
-                ), 
-            Rotation2d.fromDegrees(0)
-            )
-        );
         setupPathPlanner();
     }
 
@@ -156,6 +140,7 @@ public class SwerveSubsystem extends SubsystemBase {
             edu.wpi.first.units.Units.MetersPerSecond.of(0)
         );
     }
+
     
     //characterizes the drive motors using sysid
     public Command sysIdDriveMotorCommand() {

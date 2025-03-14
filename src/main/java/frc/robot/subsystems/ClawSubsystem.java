@@ -84,7 +84,7 @@ public class ClawSubsystem extends SubsystemBase{
     public Command reverseIntake() {
         return startEnd(
             () -> {
-                intakeMotor.set(-EndEffectorConstants.kIntakeSpeed);
+                intakeMotor.set(-1);
             },
             () -> {
                 intakeMotor.set(0);

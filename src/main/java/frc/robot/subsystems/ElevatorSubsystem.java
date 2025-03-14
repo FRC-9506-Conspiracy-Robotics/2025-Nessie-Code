@@ -32,9 +32,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double targetPosition;
     private int currentFloor = 0;
     private final int bottomFloor = 0;
-    private final int topFloor = 3;
+    private final int topFloor = 4;
     private final double[] floorHeights = {
-        ElevatorConstants.minExtension, 
+        ElevatorConstants.minExtension,
+        ElevatorConstants.intakeSetpoint, 
         ElevatorConstants.l2Setpoint, 
         ElevatorConstants.l3Setpoint, 
         ElevatorConstants.l4Setpoint,

@@ -244,6 +244,14 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveDrive.lockPose();
     }
 
+    public void zeroGyro() {
+        swerveDrive.zeroGyro();
+    }
+
+    public Command zero() {
+        return runOnce(() -> zeroGyro());
+    }
+
     //moves robot based on translation and angle
     public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX) {
         return run(() -> {

@@ -66,6 +66,12 @@ public class ElbowSubsystem extends SubsystemBase{
         System.out.println("New position " + getElbowAngleRad() * 180 / Math.PI);
     }
 
+    public Command fixSetpoint() {
+        return runOnce(() -> {
+            elbowPid.reset(getElbowAngleRad());
+        });
+    }
+
     public Command resetZero() {
         return runOnce(() -> setZero());
     }

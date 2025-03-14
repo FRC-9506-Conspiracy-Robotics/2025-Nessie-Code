@@ -91,7 +91,6 @@ public class RobotContainer {
         mDriverController.x().onTrue(elevator.holdPosition());
         mDriverController.y().onTrue(elevator.stopElevator());
         limitTrigger.onTrue(elevator.stopElevator());
-        mDriverController.b().whileTrue(autoAlignProgram.autoAlign());
     }
 
     public Command getAutonomousCommand() {

@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -77,15 +78,13 @@ public class ElbowSubsystem extends SubsystemBase{
             -12,
             12
         );
-
+        SmartDashboard.putNumber("Elbow voltage", voltsOut);
         elbowMotor.setVoltage(voltsOut);
     }
 
     public Command setElbowAngle(double angleInRad) {
         return run(() -> {
                 elbowGoToAngle(angleInRad); 
-
-                System.out.println("Elbow Position: " + getElbowAngleRad() * 180.0 / Math.PI);
             }
         );
     }

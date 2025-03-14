@@ -98,6 +98,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorEncoder.setPosition(0.0);
         homedStatus = true;
         targetPosition = 0.0;
+        currentFloor = 0;
         elevatorPid.reset(0.0);
         System.out.println("Elevator homed");
     }

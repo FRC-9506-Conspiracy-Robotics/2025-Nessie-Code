@@ -34,7 +34,7 @@ public final class Constants {
         public static final double l2Setpoint = 24;
         public static final double l3Setpoint = 40;
         public static final double l4Setpoint = 55;
-        public static final double intakeSetpoint = 12;
+        public static final double intakeSetpoint = 14;
         //pid constants
         public static final double kElevatorKp = 0.25;
         public static final double kElevatorKi = 0;
@@ -59,7 +59,7 @@ public final class Constants {
         public static final double kIntakeSpeed = 0.2;
         public static final double startingAngle = Units.degreesToRadians(90);
         public static final double restingAngle = Units.degreesToRadians(30);
-        public static final double intakeAngle = Units.degreesToRadians(80);
+        public static final double intakeAngle = Units.degreesToRadians(70);
         public static final double kElbowGearing = 125;
 
         public static final double kMaxElbowVelocity = 1;
@@ -76,12 +76,12 @@ public final class Constants {
         public static final double kElbowkA = 0.0;
         public static final double kElbowkG = 0.1;
 
-        public static final double wristHorizontalAngle = 0;
-        public static final double wristVerticalAngle = 90;
+        public static final double wristHorizontalAngle = 0 * Math.PI / 180.0;
+        public static final double wristVerticalAngle = 90 * Math.PI / 180.0;
         public static final double kWristGearing = 14.2; // magic number
 
-        public static final double kMaxWristVelocity = 2;
-        public static final double kMaxWristAccel = 4;
+        public static final double kMaxWristVelocity = 4 * Math.PI * 0.5;
+        public static final double kMaxWristAccel = 10;
         public static final int kWristCurrentLimit = 20;
         public static final double kWristRampRate = 0.1;
 
@@ -89,9 +89,9 @@ public final class Constants {
         public static final double kWristKi = 0;
         public static final double kWristKd = 0;
         
-        public static final double kWristkS = 0.5;
-        public static final double kWristkV = 0.15;
+        public static final double kWristkS = 0.0;
+        public static final double kWristkV = 0.2;
         public static final double kWristkA = 0.0;
-        public static final double kWristkG = 0;
+        public static final double kWristkG = 0.1;
     }
 }

@@ -17,6 +17,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CanId;
 import frc.robot.Constants.EndEffectorConstants;
 
@@ -83,7 +84,7 @@ public class ClawSubsystem extends SubsystemBase{
     public Command reverseIntake() {
         return startEnd(
             () -> {
-                intakeMotor.set(-EndEffectorConstants.kIntakeSpeed);
+                intakeMotor.set(-1);
             },
             () -> {
                 intakeMotor.set(0);
@@ -102,6 +103,7 @@ public class ClawSubsystem extends SubsystemBase{
     public void setZero() {
         System.out.println("Setting encoder position");
         wristEncoder.setPosition((EndEffectorConstants.wristHorizontalAngle) / 360 * EndEffectorConstants.kWristGearing);
+        wristPid.reset(getWristAngleRad());
         System.out.println("New position " + getWristAngleRad() * 180 / Math.PI);
 
     }
@@ -111,14 +113,20 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
     public void wristGoToAngle(double angleRad) {
+        double fbComponent = wristPid.calculate(getWristAngleRad(), angleRad);
+        double ffComponent = wristFeed.calculateWithVelocities(
+            getWristAngleRad(), 
+            wristPid.getSetpoint().velocity, wristPid.getSetpoint().velocity);
+
         double voltsOut = MathUtil.clamp(
-            wristPid.calculate(getWristAngleRad(), angleRad)
-            + wristFeed.calculateWithVelocities(getWristAngleRad(), wristPid.getSetpoint().velocity, wristPid.getSetpoint().velocity),
+            fbComponent + ffComponent,
             -12,
             12
         );
 
         wristMotor.setVoltage(voltsOut);
+        SmartDashboard.putNumber("Wrist feedback", fbComponent);
+        SmartDashboard.putNumber("Wrist feedforward", ffComponent);
     }
 
     public double getWristAngleRad() {
@@ -150,5 +158,12 @@ public class ClawSubsystem extends SubsystemBase{
                 System.out.println("Position: " + getWristAngleRad());
             }
         );
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Wrist output current: ", wristMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Wrist angle:", getWristAngleRad() * 180 / Math.PI);
+        SmartDashboard.putNumber("wrist PID target vel", wristPid.getSetpoint().velocity);
     }
 }

@@ -8,7 +8,7 @@ import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.Constants.EndEffectorConstants;
 
-public class ReceiveCoralConfiguration {
+public class Macros {
     // This sequence is responsible for ensuring the following goals:
     // 1. Get the elevator into coral station height
     // 2. Set elbow down
@@ -19,7 +19,7 @@ public class ReceiveCoralConfiguration {
     private final ClawSubsystem claw;
     private final ElbowSubsystem elbow;
 
-    public ReceiveCoralConfiguration( 
+    public Macros( 
         ElevatorSubsystem elevator, 
         ClawSubsystem claw, 
         ElbowSubsystem elbow
@@ -35,5 +35,13 @@ public class ReceiveCoralConfiguration {
         .until(() -> {return claw.getWristAngleRad() < (5 * Math.PI / 180.0);})
         .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
     }
-    
+
+    public Command configureForL4() {
+        return this.elbow.setElbowAngle(EndEffectorConstants.restingAngle)
+        .andThen(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle))
+        .until(() -> {
+            return elbow.getElbowAngleRad() < (
+                EndEffectorConstants.restingAngle + 5 * Math.PI / 180.0
+            );}).andThen(elevator.goToFloor(4));
+    }
 }

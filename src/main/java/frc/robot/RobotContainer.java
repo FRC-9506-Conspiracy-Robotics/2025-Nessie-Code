@@ -23,7 +23,7 @@ import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.commands.ReceiveCoralConfiguration;
+import frc.robot.commands.Macros;
 //import frc.robot.subsystems.RGBSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
@@ -37,7 +37,7 @@ public class RobotContainer {
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
     public final ElbowSubsystem elbow = new ElbowSubsystem();
     public final ClawSubsystem claw = new ClawSubsystem();
-    private final ReceiveCoralConfiguration receiveCoralCmd = new ReceiveCoralConfiguration(
+    private final Macros macros = new Macros(
         elevator,
         claw,
         elbow
@@ -101,8 +101,7 @@ public class RobotContainer {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
 
-        mDriverController.y().toggleOnTrue(elevator.goToCurrentFloor());
-        mDriverController.y().toggleOnFalse(elevator.goToBottom());
+        mDriverController.y().onTrue(macros.configureForL4());
         mDriverController.start().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
         mDriverController.a().whileTrue(claw.runIntake());
         mDriverController.x().whileTrue(claw.reverseIntake());
@@ -118,7 +117,7 @@ public class RobotContainer {
         mDriverController.rightStick().onTrue(elbow.fixSetpoint());
 
         mDriverController.leftTrigger(0.5).onTrue(toggleSpeedModifier());
-        mDriverController.rightTrigger(0.5).onTrue(receiveCoralCmd.getIntoCoralReceiveConfig());
+        mDriverController.rightTrigger(0.5).onTrue(macros.getIntoCoralReceiveConfig());
     }
 
     public Command getAutonomousCommand() {

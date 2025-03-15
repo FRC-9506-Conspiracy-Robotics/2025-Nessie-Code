@@ -31,11 +31,12 @@ import swervelib.SwerveInputStream;
 
 public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
+    private double speedModifier = 1.0;
+
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
     public final ElbowSubsystem elbow = new ElbowSubsystem();
     public final ClawSubsystem claw = new ClawSubsystem();
-    private boolean highGear = true;
     private final ReceiveCoralConfiguration receiveCoralCmd = new ReceiveCoralConfiguration(
         elevator,
         claw,
@@ -45,10 +46,12 @@ public class RobotContainer {
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
-    SwerveInputStream.of(drivebase.getSwerveDrive(),
-    () -> mDriverController.getLeftY() * -1,
-    () -> mDriverController.getLeftX() * -1)
-    .withControllerRotationAxis(mDriverController::getRightX)
+    SwerveInputStream.of(
+        drivebase.getSwerveDrive(),
+        () -> mDriverController.getLeftY() * -speedModifier,
+        () -> mDriverController.getLeftX() * -speedModifier
+    )
+    .withControllerRotationAxis(() -> mDriverController.getRightX() * speedModifier)
     .deadband(DriverConstants.kDeadband)
     .scaleTranslation(0.8)
     .allianceRelativeControl(true);
@@ -77,6 +80,18 @@ public class RobotContainer {
         claw.resetZero();
     }
 
+    private Command toggleSpeedModifier() {
+        return Commands.runOnce(
+            () -> {
+                if (speedModifier == 1.0) {
+                    speedModifier = 0.5;
+                } else {
+                    speedModifier = 1.0;
+                }
+            }, 
+        drivebase);
+    }
+
     private void configureBindings() {
         Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
         Command driveFieldOrientedAngularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocity);
@@ -102,6 +117,7 @@ public class RobotContainer {
         mDriverController.leftStick().onTrue(drivebase.zero());
         mDriverController.rightStick().onTrue(elbow.fixSetpoint());
 
+        mDriverController.leftTrigger(0.5).onTrue(toggleSpeedModifier());
         mDriverController.rightTrigger(0.5).onTrue(receiveCoralCmd.getIntoCoralReceiveConfig());
     }
 

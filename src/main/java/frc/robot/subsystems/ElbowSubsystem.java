@@ -23,6 +23,7 @@ import frc.robot.Constants.EndEffectorConstants;
 public class ElbowSubsystem extends SubsystemBase{
     private final SparkMax elbowMotor = new SparkMax(CanId.elbowMotorCan, MotorType.kBrushless);
     private final RelativeEncoder elbowEncoder = elbowMotor.getEncoder();
+    private double targetAngleRad = 90 * Math.PI / 180.0;
 
     private final ProfiledPIDController elbowPid =
         new ProfiledPIDController(
@@ -63,12 +64,14 @@ public class ElbowSubsystem extends SubsystemBase{
     public void setZero() {
         System.out.println("Setting encoder position");
         elbowEncoder.setPosition(0.25 * EndEffectorConstants.kElbowGearing);
+        targetAngleRad = getElbowAngleRad();
         System.out.println("New position " + getElbowAngleRad() * 180 / Math.PI);
     }
 
     public Command fixSetpoint() {
         return runOnce(() -> {
             elbowPid.reset(getElbowAngleRad());
+            targetAngleRad = getElbowAngleRad();
         });
     }
 
@@ -84,13 +87,14 @@ public class ElbowSubsystem extends SubsystemBase{
             -12,
             12
         );
-        SmartDashboard.putNumber("Elbow voltage", voltsOut);
+        SmartDashboard.putNumber("Elbow target position", angleRad * 180 / Math.PI);
         elbowMotor.setVoltage(voltsOut);
     }
 
     public Command setElbowAngle(double angleInRad) {
-        return run(() -> {
-                elbowGoToAngle(angleInRad); 
+        return runOnce(
+            () -> {
+                 targetAngleRad = angleInRad;
             }
         );
     }
@@ -116,5 +120,10 @@ public class ElbowSubsystem extends SubsystemBase{
                 System.out.println("Position: " + getElbowAngleRad());
             }
         );
+    }
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Elbow current position", getElbowAngleRad() * 180.0 / Math.PI);
+        elbowGoToAngle(targetAngleRad);
     }
 }

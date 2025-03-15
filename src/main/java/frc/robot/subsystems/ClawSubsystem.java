@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -140,7 +141,7 @@ public class ClawSubsystem extends SubsystemBase{
     public Command setWristAngle(double angleInRad) {
         return run(() -> {
                 wristGoToAngle(angleInRad);
-                System.out.println("Wrist Position: " + (getWristAngleRad() * 180 / Math.PI));
+                //System.out.println("Wrist Position: " + (getWristAngleRad() * 180 / Math.PI));
             }
         );
     }
@@ -163,7 +164,7 @@ public class ClawSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Wrist output current: ", wristMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Wrist angle:", getWristAngleRad() * 180 / Math.PI);
+        SmartDashboard.putNumber("Wrist angle:", Units.radiansToDegrees(getWristAngleRad()));
         SmartDashboard.putNumber("wrist PID target vel", wristPid.getSetpoint().velocity);
     }
 }

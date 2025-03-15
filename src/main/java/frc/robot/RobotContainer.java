@@ -23,6 +23,7 @@ import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.commands.ReceiveCoralConfiguration;
 //import frc.robot.subsystems.RGBSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import java.io.File;
@@ -32,8 +33,14 @@ public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
-    private final ElbowSubsystem elbow = new ElbowSubsystem();
-    private final ClawSubsystem claw = new ClawSubsystem();
+    public final ElbowSubsystem elbow = new ElbowSubsystem();
+    public final ClawSubsystem claw = new ClawSubsystem();
+    private boolean highGear = true;
+    private final ReceiveCoralConfiguration receiveCoralCmd = new ReceiveCoralConfiguration(
+        elevator,
+        claw,
+        elbow
+    );
 //    private final RGBSubsystem rgb = new RGBSubsystem();
 
     //converts controller inputs to swerveinputstream type for field oriented
@@ -81,7 +88,7 @@ public class RobotContainer {
 
         mDriverController.y().toggleOnTrue(elevator.goToCurrentFloor());
         mDriverController.y().toggleOnFalse(elevator.goToBottom());
-        mDriverController.b().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
+        mDriverController.start().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
         mDriverController.a().whileTrue(claw.runIntake());
         mDriverController.x().whileTrue(claw.reverseIntake());
 
@@ -94,6 +101,8 @@ public class RobotContainer {
 
         mDriverController.leftStick().onTrue(drivebase.zero());
         mDriverController.rightStick().onTrue(elbow.fixSetpoint());
+
+        mDriverController.rightTrigger(0.5).onTrue(receiveCoralCmd.getIntoCoralReceiveConfig());
     }
 
     public Command getAutonomousCommand() {

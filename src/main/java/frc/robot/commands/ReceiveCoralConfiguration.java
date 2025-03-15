@@ -2,9 +2,11 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.Constants.EndEffectorConstants;
 
 public class ReceiveCoralConfiguration {
     // This sequence is responsible for ensuring the following goals:
@@ -28,7 +30,10 @@ public class ReceiveCoralConfiguration {
     }
 
     public Command getIntoCoralReceiveConfig() {
-        return this.elevator.goToFloor(1);
+        return this.elevator.goToFloor(1)
+        .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
+        .until(() -> {return claw.getWristAngleRad() < (5 * Math.PI / 180.0);})
+        .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
     }
     
 }

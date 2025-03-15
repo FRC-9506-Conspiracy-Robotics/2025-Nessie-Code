@@ -61,6 +61,7 @@ public final class Constants {
         public static final double startingAngle = Units.degreesToRadians(90);
         public static final double restingAngle = Units.degreesToRadians(30);
         public static final double intakeAngle = Units.degreesToRadians(70);
+        public static final double fullyVertical = Units.degreesToRadians(75);
         public static final double kElbowGearing = 125;
 
         public static final double kMaxElbowVelocity = 1;

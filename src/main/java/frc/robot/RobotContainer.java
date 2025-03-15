@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriverConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElbowSubsystem;
@@ -21,7 +22,6 @@ import swervelib.SwerveInputStream;
 
 public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
-    private double speedModifier = 1.0;
 
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -38,10 +38,10 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocity = 
     SwerveInputStream.of(
         drivebase.getSwerveDrive(),
-        () -> mDriverController.getLeftY() * -speedModifier,
-        () -> mDriverController.getLeftX() * -speedModifier
+        () -> mDriverController.getLeftY() * -getSpeedModifier(),
+        () -> mDriverController.getLeftX() * -getSpeedModifier()
     )
-    .withControllerRotationAxis(() -> mDriverController.getRightX() * speedModifier)
+    .withControllerRotationAxis(() -> mDriverController.getRightX() * getSpeedModifier())
     .deadband(DriverConstants.kDeadband)
     .scaleTranslation(0.8)
     .allianceRelativeControl(true);
@@ -70,18 +70,13 @@ public class RobotContainer {
         claw.resetZero();
     }
 
-    private Command toggleSpeedModifier() {
-        return Commands.runOnce(
-            () -> {
-                if (speedModifier == 1.0) {
-                    speedModifier = 0.5;
-                } else {
-                    speedModifier = 1.0;
-                }
-
-                SmartDashboard.putNumber("current speed setting", speedModifier);
-            }, 
-        drivebase);
+    private double getSpeedModifier() {
+        if (elevator.getHeightInches() > (ElevatorConstants.intakeSetpoint)) {
+            double slope = (0.25 - 1.0) / (ElevatorConstants.l4Setpoint - ElevatorConstants.intakeSetpoint);
+            double intercept = 1.0 - slope * ElevatorConstants.intakeSetpoint;
+            return slope * elevator.getHeightInches() + intercept;
+        }
+        return 1.0;
     }
 
     private void configureBindings() {
@@ -108,7 +103,6 @@ public class RobotContainer {
         mDriverController.leftStick().onTrue(drivebase.zero());
         mDriverController.rightStick().onTrue(elbow.fixSetpoint());
 
-        mDriverController.leftTrigger(0.5).onTrue(toggleSpeedModifier());
         mDriverController.rightTrigger(0.5).onTrue(macros.getIntoCoralReceiveConfig());
     }
 

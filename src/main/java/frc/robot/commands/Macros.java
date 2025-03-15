@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ElbowSubsystem;
@@ -40,6 +41,11 @@ public class Macros {
         .until(() -> {
             return elbow.getElbowAngleRad() < (
                 EndEffectorConstants.restingAngle + 5 * Math.PI / 180.0
-            );}).andThen(elevator.goToFloor(4));
+            );})
+        .andThen(elevator.goToFloor(4))
+        .until(() -> {
+            return elevator.getHeightInches() > (ElevatorConstants.l4Setpoint - 3.0);
+        })
+        .andThen(elbow.setElbowAngle(EndEffectorConstants.fullyVertical));
     }
 }

@@ -5,14 +5,13 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriverConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ElbowSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.commands.Macros;
@@ -23,6 +22,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
 
+    private final Climber climber = new Climber();
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
     public final ElbowSubsystem elbow = new ElbowSubsystem();
@@ -92,6 +92,7 @@ public class RobotContainer {
         mDriverController.start().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
         mDriverController.a().whileTrue(claw.runIntake());
         mDriverController.x().whileTrue(claw.reverseIntake());
+        mDriverController.b().onTrue(climber.climb());
 
         mDriverController.leftBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
         mDriverController.rightBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));

@@ -28,6 +28,7 @@ public class ClawSubsystem extends SubsystemBase{
 
     private final SparkMax wristMotor = new SparkMax(CanId.wristMotorCan, MotorType.kBrushless);
     private final RelativeEncoder wristEncoder = wristMotor.getEncoder();
+    private double targetAngleRad = 0.0;
 
     private final ProfiledPIDController wristPid = 
         new ProfiledPIDController(
@@ -139,11 +140,9 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
     public Command setWristAngle(double angleInRad) {
-        return run(() -> {
-                wristGoToAngle(angleInRad);
-                //System.out.println("Wrist Position: " + (getWristAngleRad() * 180 / Math.PI));
-            }
-        );
+        return runOnce(() -> {
+            targetAngleRad = angleInRad;
+        });
     }
 
     private double holdAngle = 0;
@@ -166,5 +165,18 @@ public class ClawSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Wrist output current: ", wristMotor.getOutputCurrent());
         SmartDashboard.putNumber("Wrist angle:", Units.radiansToDegrees(getWristAngleRad()));
         SmartDashboard.putNumber("wrist PID target vel", wristPid.getSetpoint().velocity);
+
+        double fbComponent = wristPid.calculate(getWristAngleRad(), targetAngleRad);
+        double ffComponent = wristFeed.calculateWithVelocities(
+            getWristAngleRad(), 
+            wristPid.getSetpoint().velocity, wristPid.getSetpoint().velocity);
+
+        double voltsOut = MathUtil.clamp(
+            fbComponent + ffComponent,
+            -12,
+            12
+        );
+
+        wristMotor.setVoltage(voltsOut);
     }
 }

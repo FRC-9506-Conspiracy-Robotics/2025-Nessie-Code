@@ -107,6 +107,15 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return  drivebase.getAutonomousCommand("New Auto");
+        return  drivebase.getAutonomousCommand("New Auto")
+        .andThen(elbow.block())
+        .withTimeout(2.0)
+        .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
+        .andThen(elbow.block())
+        .until(()->{
+            return elbow.getElbowAngleRad() < (
+                EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
+            );})
+        .andThen(claw.reverseIntake());
     }
 }

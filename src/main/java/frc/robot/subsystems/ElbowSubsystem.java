@@ -119,6 +119,11 @@ public class ElbowSubsystem extends SubsystemBase{
             }
         );
     }
+    
+    public Command block() {
+        return run(() -> {});
+    }
+    
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Elbow current position", getElbowAngleRad() * 180.0 / Math.PI);

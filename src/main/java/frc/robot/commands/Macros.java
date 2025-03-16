@@ -38,9 +38,10 @@ public class Macros {
     public Command configureForL4() {
         return this.elbow.setElbowAngle(EndEffectorConstants.restingAngle)
         .andThen(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle))
+        .andThen(claw.block())
         .until(() -> {
             return elbow.getElbowAngleRad() < (
-                EndEffectorConstants.restingAngle + 5 * Math.PI / 180.0
+                EndEffectorConstants.restingAngle + (5 * Math.PI / 180.0)
             );})
         .andThen(elevator.goToFloor(4))
         .until(() -> {

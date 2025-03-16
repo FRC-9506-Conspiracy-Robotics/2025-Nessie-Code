@@ -160,6 +160,10 @@ public class ClawSubsystem extends SubsystemBase{
         );
     }
 
+    public Command block() {
+        return run(() -> {});
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Wrist output current: ", wristMotor.getOutputCurrent());

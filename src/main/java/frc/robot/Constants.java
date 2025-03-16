@@ -23,6 +23,11 @@ public final class Constants {
         public static final int elbowMotorCan = 12;
         public static final int elevatorMotorCan = 13;
         public static final int elevatorFollowerCan = 14;
+        public static final int climberMotorCan = 15;
+    }
+
+    public static class ClimberConstants {
+        public static final int kClimberMotorCurrentLimit = 40;
     }
 
     public static class ElevatorConstants {

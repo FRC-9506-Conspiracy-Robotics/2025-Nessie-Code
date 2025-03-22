@@ -108,11 +108,10 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        String driveAutoName = SmartDashboard.getString("auto-name", "New Auto");
-        double waitTime = SmartDashboard.getNumber("auto-wait-time", 4.0);
-        return  drivebase.getAutonomousCommand(driveAutoName)
+        return  drivebase.getAutonomousCommand("New Auto");
+        /**
         .andThen(elbow.block())
-        .withTimeout(waitTime)
+        .withTimeout(4.0)
         .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
         .andThen(elbow.block())
         .until(()->{
@@ -120,5 +119,6 @@ public class RobotContainer {
                 EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
             );})
         .andThen(claw.reverseIntake());
+        */
     }
 }

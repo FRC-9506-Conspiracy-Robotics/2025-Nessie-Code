@@ -5,6 +5,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -107,9 +108,11 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return  drivebase.getAutonomousCommand("New Auto")
+        String driveAutoName = SmartDashboard.getString("auto-name", "New Auto");
+        double waitTime = SmartDashboard.getNumber("auto-wait-time", 4.0);
+        return  drivebase.getAutonomousCommand(driveAutoName)
         .andThen(elbow.block())
-        .withTimeout(2.0)
+        .withTimeout(waitTime)
         .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
         .andThen(elbow.block())
         .until(()->{

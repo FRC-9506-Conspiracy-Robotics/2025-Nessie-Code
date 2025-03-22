@@ -47,7 +47,8 @@ public class Climber extends SubsystemBase {
     public Command deploy() {
         return runEnd(
             () -> {
-                climberMotor.set(-0.25);
+                double deploySpeed = SmartDashboard.getNumber("deploy-speed", 0.0);
+                climberMotor.set(-deploySpeed);
             },
             () -> {
                 climberMotor.set(0.0);

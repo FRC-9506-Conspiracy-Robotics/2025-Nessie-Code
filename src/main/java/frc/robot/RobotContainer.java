@@ -105,7 +105,7 @@ public class RobotContainer {
 
         mDriverController.rightTrigger(0.5).onTrue(macros.getIntoCoralReceiveConfig());
         mDriverController.b().toggleOnTrue(climber.deploy());
-        mDriverController.leftTrigger().toggleOnTrue(climber.climb());
+        mDriverController.leftTrigger(0.5).toggleOnTrue(climber.climb());
     }
 
     public Command getAutonomousCommand() {

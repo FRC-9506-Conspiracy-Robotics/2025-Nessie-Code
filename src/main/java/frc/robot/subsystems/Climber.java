@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CanId;
@@ -34,7 +35,8 @@ public class Climber extends SubsystemBase {
     public Command climb() {
         return runEnd(
             () -> {
-                climberMotor.set(1.0);
+                double climbSpeed = SmartDashboard.getNumber("climb-speed", 0.0);
+                climberMotor.set(climbSpeed);
             },
             () -> {
                 climberMotor.set(0.0);

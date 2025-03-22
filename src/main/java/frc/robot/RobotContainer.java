@@ -92,7 +92,6 @@ public class RobotContainer {
         mDriverController.start().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
         mDriverController.a().whileTrue(claw.runIntake());
         mDriverController.x().whileTrue(claw.reverseIntake());
-        mDriverController.b().onTrue(climber.climb());
 
         mDriverController.leftBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
         mDriverController.rightBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
@@ -105,6 +104,8 @@ public class RobotContainer {
         mDriverController.rightStick().onTrue(elbow.fixSetpoint());
 
         mDriverController.rightTrigger(0.5).onTrue(macros.getIntoCoralReceiveConfig());
+        mDriverController.b().toggleOnTrue(climber.deploy());
+        mDriverController.leftTrigger().toggleOnTrue(climber.climb());
     }
 
     public Command getAutonomousCommand() {

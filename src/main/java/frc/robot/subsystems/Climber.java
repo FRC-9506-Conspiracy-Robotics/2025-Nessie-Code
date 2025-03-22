@@ -32,8 +32,24 @@ public class Climber extends SubsystemBase {
     }
 
     public Command climb() {
-        return run(() -> {
-            climberMotor.set(0.5);
-        });
+        return runEnd(
+            () -> {
+                climberMotor.set(1.0);
+            },
+            () -> {
+                climberMotor.set(0.0);
+            }
+        );
+    }
+
+    public Command deploy() {
+        return runEnd(
+            () -> {
+                climberMotor.set(-0.25);
+            },
+            () -> {
+                climberMotor.set(0.0);
+            }
+        );
     }
 }

@@ -36,7 +36,7 @@ public class Climber extends SubsystemBase {
         return runEnd(
             () -> {
                 double climbSpeed = SmartDashboard.getNumber("climb-speed", 0.0);
-                climberMotor.set(climbSpeed);
+                climberMotor.set(-1);
             },
             () -> {
                 climberMotor.set(0.0);
@@ -48,7 +48,7 @@ public class Climber extends SubsystemBase {
         return runEnd(
             () -> {
                 double deploySpeed = SmartDashboard.getNumber("deploy-speed", 0.0);
-                climberMotor.set(-deploySpeed);
+                climberMotor.set(1.0);
             },
             () -> {
                 climberMotor.set(0.0);

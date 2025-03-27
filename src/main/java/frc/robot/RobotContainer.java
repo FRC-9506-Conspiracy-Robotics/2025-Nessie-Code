@@ -41,7 +41,7 @@ public class RobotContainer {
         () -> mDriverController.getLeftY() * -getSpeedModifier(),
         () -> mDriverController.getLeftX() * -getSpeedModifier()
     )
-    .withControllerRotationAxis(() -> mDriverController.getRightX() * getSpeedModifier())
+    .withControllerRotationAxis(() -> -mDriverController.getRightX() * getSpeedModifier())
     .deadband(DriverConstants.kDeadband)
     .scaleTranslation(0.8)
     .allianceRelativeControl(true);
@@ -109,9 +109,10 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return  drivebase.getAutonomousCommand("New Auto")
+        return  drivebase.getAutonomousCommand("leftStartL1")
+        
         .andThen(elbow.block())
-        .withTimeout(2.0)
+        .withTimeout(4.0)
         .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
         .andThen(elbow.block())
         .until(()->{
@@ -119,5 +120,6 @@ public class RobotContainer {
                 EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
             );})
         .andThen(claw.reverseIntake());
+        
     }
 }

@@ -120,18 +120,17 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return  drivebase.getAutonomousCommand("New Auto");
-        //.andThen(resetDriveTimer())
-        //.andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
-        //.andThen(elbow.block())
-        //.until(()->{
-            //SmartDashboard.putNumber("Auto timer", driveTimer.get());
-            //return driveTimer.get() > 2.0;
-            //return elbow.getElbowAngleRad() < (
-            //    EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
-            //);
-        //})
-        //.andThen(claw.reverseIntake());
+        return  drivebase.getAutonomousCommand("leftStartL1")
+        .andThen(elbow.setElbowAngle(EndEffectorConstants.fullyVertical))
+        .andThen(elbow.block())
+        .withTimeout(4.0)
+        .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
+        .andThen(claw.block())
+        .until(()->{
+            return elbow.getElbowAngleRad() < (
+                EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
+            );})
+        .andThen(claw.reverseIntake());
         
     }
 }

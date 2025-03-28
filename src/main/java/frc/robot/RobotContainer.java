@@ -110,11 +110,11 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return  drivebase.getAutonomousCommand("leftStartL1")
-        
+        .andThen(elbow.setElbowAngle(EndEffectorConstants.fullyVertical))
         .andThen(elbow.block())
         .withTimeout(4.0)
         .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
-        .andThen(elbow.block())
+        .andThen(claw.block())
         .until(()->{
             return elbow.getElbowAngleRad() < (
                 EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)

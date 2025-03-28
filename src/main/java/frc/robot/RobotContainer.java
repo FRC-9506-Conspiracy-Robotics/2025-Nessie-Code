@@ -120,7 +120,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return  drivebase.getAutonomousCommand("leftStartL1")
+        return  drivebase.getAutonomousCommand("New Auto")
         .andThen(elbow.setElbowAngle(EndEffectorConstants.fullyVertical))
         .andThen(elbow.block())
         .withTimeout(4.0)
@@ -131,6 +131,5 @@ public class RobotContainer {
                 EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
             );})
         .andThen(claw.reverseIntake());
-        
     }
 }

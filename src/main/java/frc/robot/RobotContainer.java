@@ -5,7 +5,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriverConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -22,6 +25,7 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
 
+    private final Timer driveTimer = new Timer();
     private final Climber climber = new Climber();
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
     private final ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -108,18 +112,26 @@ public class RobotContainer {
         mDriverController.leftTrigger(0.5).toggleOnTrue(climber.climb());
     }
 
+    public Command resetDriveTimer() {
+        return Commands.runOnce(() -> {
+            driveTimer.reset();
+            driveTimer.start();
+        }, drivebase);
+    }
+
     public Command getAutonomousCommand() {
-        return  drivebase.getAutonomousCommand("leftStartL1")
-        
-        .andThen(elbow.block())
-        .withTimeout(4.0)
-        .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
-        .andThen(elbow.block())
-        .until(()->{
-            return elbow.getElbowAngleRad() < (
-                EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
-            );})
-        .andThen(claw.reverseIntake());
+        return  drivebase.getAutonomousCommand("New Auto");
+        //.andThen(resetDriveTimer())
+        //.andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
+        //.andThen(elbow.block())
+        //.until(()->{
+            //SmartDashboard.putNumber("Auto timer", driveTimer.get());
+            //return driveTimer.get() > 2.0;
+            //return elbow.getElbowAngleRad() < (
+            //    EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
+            //);
+        //})
+        //.andThen(claw.reverseIntake());
         
     }
 }

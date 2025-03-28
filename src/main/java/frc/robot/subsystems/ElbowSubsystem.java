@@ -121,7 +121,7 @@ public class ElbowSubsystem extends SubsystemBase{
     }
     
     public Command block() {
-        return run(() -> {});
+        return run(() -> {elbowGoToAngle(targetAngleRad);});
     }
     
     @Override

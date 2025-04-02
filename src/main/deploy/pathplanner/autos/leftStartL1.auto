@@ -9,6 +9,12 @@
           "data": {
             "pathName": "leftmostStartL1"
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
         }
       ]
     }

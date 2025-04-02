@@ -62,7 +62,7 @@ public class ElbowSubsystem extends SubsystemBase{
     public void setZero() {
         System.out.println("Setting encoder position");
         elbowEncoder.setPosition(0.25 * EndEffectorConstants.kElbowGearing);
-        targetAngleRad = getElbowAngleRad();
+        //targetAngleRad = getElbowAngleRad();
         System.out.println("New position " + getElbowAngleRad() * 180 / Math.PI);
     }
 

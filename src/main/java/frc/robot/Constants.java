@@ -42,7 +42,7 @@ public final class Constants {
         public static final double l4Setpoint = 55;
         public static final double intakeSetpoint = 14;
         //pid constants
-        public static final double kElevatorKp = 0.25;
+        public static final double kElevatorKp = 0.35;
         public static final double kElevatorKi = 0;
         public static final double kElevatorKd = 0.0;
         //feedforward constants
@@ -51,8 +51,8 @@ public final class Constants {
         public static final double kElevatorkA = 0.00;
         public static final double kElevatorkG = 0.25;
         //motion limits
-        public static final double kMaxVelocity = 30;
-        public static final double kMaxAccel = 100;
+        public static final double kMaxVelocity = 45;
+        public static final double kMaxAccel = 170;
         public static final int kElevatorMaxCurrent = 40;
         public static final double kElevatorRampRate = 0.1;
         //other constraints
@@ -62,24 +62,24 @@ public final class Constants {
 
     //measurements in degrees, where rotating up/counterclockwise is positive
     public static class EndEffectorConstants {
-        public static final double kIntakeSpeed = 0.2;
+        public static final double kIntakeSpeed = 0.5;
         public static final double startingAngle = Units.degreesToRadians(90);
-        public static final double restingAngle = Units.degreesToRadians(30);
+        public static final double restingAngle = Units.degreesToRadians(35);
         public static final double intakeAngle = Units.degreesToRadians(70);
         public static final double fullyVertical = Units.degreesToRadians(75);
         public static final double kElbowGearing = 125;
 
-        public static final double kMaxElbowVelocity = 1;
-        public static final double kMaxElbowAccel = 1;
+        public static final double kMaxElbowVelocity = 10;
+        public static final double kMaxElbowAccel = 10;
         public static final int kElbowCurrentLimit = 40;
         public static final double kElbowRampRate = 0.25;
         
-        public static final double kElbowKp = 1;
+        public static final double kElbowKp = 4;
         public static final double kElbowKi = 0;
         public static final double kElbowKd = 0;
         
         public static final double kElbowkS = 0.0;
-        public static final double kElbowkV = 3.0;
+        public static final double kElbowkV = 2.5;
         public static final double kElbowkA = 0.0;
         public static final double kElbowkG = 0.1;
 
@@ -87,8 +87,8 @@ public final class Constants {
         public static final double wristVerticalAngle = 90 * Math.PI / 180.0;
         public static final double kWristGearing = 14.2; // magic number
 
-        public static final double kMaxWristVelocity = 4 * Math.PI * 0.5;
-        public static final double kMaxWristAccel = 10;
+        public static final double kMaxWristVelocity = 6 * Math.PI * 0.5;
+        public static final double kMaxWristAccel = 20;
         public static final int kWristCurrentLimit = 20;
         public static final double kWristRampRate = 0.1;
 

@@ -72,7 +72,8 @@ public class RobotContainer {
     .allianceRelativeControl(true);
 
     public RobotContainer() {
-        NamedCommands.registerCommand("eject coral", this.macros.ejectCoral());
+        NamedCommands.registerCommand("eject coral", this.claw.reverseIntake());
+        NamedCommands.registerCommand("set elbow to intake", this.elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
 
         configureBindings();
         elbow.resetZero();

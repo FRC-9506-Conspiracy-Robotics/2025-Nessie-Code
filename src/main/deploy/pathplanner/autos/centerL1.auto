@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "L1"
+            "pathName": "centerL1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 0.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "set elbow to intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {

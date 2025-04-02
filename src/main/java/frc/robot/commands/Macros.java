@@ -49,4 +49,14 @@ public class Macros {
         })
         .andThen(elbow.setElbowAngle(EndEffectorConstants.fullyVertical));
     }
+
+    public Command ejectCoral() {
+        return this.elbow.setElbowAngle(EndEffectorConstants.intakeAngle)
+            .until(() -> {
+                return elbow.getElbowAngleRad() < (
+                    EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
+                );
+            })
+            .andThen(claw.reverseIntake());
+    }
 }

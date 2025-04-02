@@ -3,9 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -23,6 +26,7 @@ import java.io.File;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
+    private final SendableChooser<Command> autoChooser;
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
 
     private final Timer driveTimer = new Timer();
@@ -36,7 +40,6 @@ public class RobotContainer {
         claw,
         elbow
     );
-//    private final RGBSubsystem rgb = new RGBSubsystem();
 
     //converts controller inputs to swerveinputstream type for field oriented
     SwerveInputStream driveAngularVelocity = 
@@ -69,9 +72,15 @@ public class RobotContainer {
     .allianceRelativeControl(true);
 
     public RobotContainer() {
+        NamedCommands.registerCommand("eject coral", this.claw.reverseIntake());
+        NamedCommands.registerCommand("set elbow to intake", this.elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
+
         configureBindings();
         elbow.resetZero();
         claw.resetZero();
+
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("auto chooser", autoChooser);
     }
 
     private double getSpeedModifier() {
@@ -120,16 +129,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return  drivebase.getAutonomousCommand("New Auto")
-        .andThen(elbow.setElbowAngle(EndEffectorConstants.fullyVertical))
-        .andThen(elbow.block())
-        .withTimeout(4.0)
-        .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle))
-        .andThen(claw.block())
-        .until(()->{
-            return elbow.getElbowAngleRad() < (
-                EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
-            );})
-        .andThen(claw.reverseIntake());
+        return autoChooser.getSelected();
     }
 }

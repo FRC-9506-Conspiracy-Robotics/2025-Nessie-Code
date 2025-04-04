@@ -39,7 +39,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.elbow.resetZero().andThen(m_robotContainer.claw.resetZero()).andThen(m_robotContainer.getAutonomousCommand());
+    m_robotContainer.elbow.setZero();
+    m_robotContainer.claw.setZero();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

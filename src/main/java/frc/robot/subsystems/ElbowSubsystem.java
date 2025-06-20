@@ -21,7 +21,7 @@ import frc.robot.Constants.EndEffectorConstants;
 public class ElbowSubsystem extends SubsystemBase{
     private final SparkMax elbowMotor = new SparkMax(CanId.elbowMotorCan, MotorType.kBrushless);
     private final RelativeEncoder elbowEncoder = elbowMotor.getEncoder();
-    public double targetAngleRad = 90 * Math.PI / 180.0;
+    private double targetAngleRad = 90 * Math.PI / 180.0;
 
     private final ProfiledPIDController elbowPid =
         new ProfiledPIDController(

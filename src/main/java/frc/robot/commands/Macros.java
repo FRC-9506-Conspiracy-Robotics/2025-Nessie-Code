@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
@@ -36,7 +35,7 @@ public class Macros {
         .andThen(elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
     }
 
-    /*public Command configureForL4() {
+    public Command configureForL4() {
         return this.elbow.setElbowAngle(EndEffectorConstants.restingAngle)
         .andThen(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle))
         .andThen(claw.block())
@@ -49,17 +48,6 @@ public class Macros {
             return elevator.getHeightInches() > (ElevatorConstants.l4Setpoint - 3.0);
         })
         .andThen(elbow.setElbowAngle(EndEffectorConstants.fullyVertical));
-    }*/
-
-    public Command configureForL4() {
-        return this.elbow.setElbowAngle(Units.degreesToRadians(60))
-        .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
-        .andThen(elevator.goToFloor(4))
-        .andThen(elevator.block())
-        .until(() -> {
-            return elevator.getHeightInches() > ElevatorConstants.l4Setpoint - 5;
-        })
-        .andThen(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
     }
 
     public Command ejectCoral() {

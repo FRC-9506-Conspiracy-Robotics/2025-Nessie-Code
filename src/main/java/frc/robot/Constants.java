@@ -12,7 +12,7 @@ public final class Constants {
     }
 
     public static class SwerveConstants {
-        public static final double maxSpeed = Units.feetToMeters(15);
+        public static final double maxSpeed = Units.feetToMeters(14);
         public static final double slowSpeed = Units.feetToMeters(7.5);
     }
 
@@ -32,27 +32,27 @@ public final class Constants {
 
     public static class ElevatorConstants {
         //motion constants
-        public static final double kElevatorGearing = 25;
+        public static final double kElevatorGearing = 5;
         public static final double kSprocketPitch = 1.76;
         //extension constants
         public static final double minExtension = 0;
-        public static final double maxExtension = 56;
+        public static final double maxExtension = 59;
         public static final double l2Setpoint = 24;
-        public static final double l3Setpoint = 40;
-        public static final double l4Setpoint = 55;
+        public static final double l3Setpoint = 30;
+        public static final double l4Setpoint = 56;
         public static final double intakeSetpoint = 14;
         //pid constants
-        public static final double kElevatorKp = 0.35;
-        public static final double kElevatorKi = 0;
+        public static final double kElevatorKp = 0.0;
+        public static final double kElevatorKi = 0.0;
         public static final double kElevatorKd = 0.0;
         //feedforward constants
-        public static final double kElevatorkS = 0.25;
-        public static final double kElevatorkV = 0.25;
-        public static final double kElevatorkA = 0.00;
-        public static final double kElevatorkG = 0.25;
+        public static final double kElevatorkS = 0.0;
+        public static final double kElevatorkV = 0.0;
+        public static final double kElevatorkA = 0.0;
+        public static final double kElevatorkG = 0.0;
         //motion limits
-        public static final double kMaxVelocity = 45;
-        public static final double kMaxAccel = 170;
+        public static final double kMaxVelocity = 50;
+        public static final double kMaxAccel = 100;
         public static final int kElevatorMaxCurrent = 40;
         public static final double kElevatorRampRate = 0.1;
         //other constraints
@@ -74,14 +74,14 @@ public final class Constants {
         public static final int kElbowCurrentLimit = 40;
         public static final double kElbowRampRate = 0.25;
         
-        public static final double kElbowKp = 4;
+        public static final double kElbowKp = 0;
         public static final double kElbowKi = 0;
         public static final double kElbowKd = 0;
         
         public static final double kElbowkS = 0.0;
-        public static final double kElbowkV = 2.5;
+        public static final double kElbowkV = 0.0;
         public static final double kElbowkA = 0.0;
-        public static final double kElbowkG = 0.1;
+        public static final double kElbowkG = 0.0;
 
         public static final double wristHorizontalAngle = 0 * Math.PI / 180.0;
         public static final double wristVerticalAngle = 90 * Math.PI / 180.0;

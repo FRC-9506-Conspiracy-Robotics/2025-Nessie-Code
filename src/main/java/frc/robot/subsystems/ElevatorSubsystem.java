@@ -185,11 +185,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         return false;
     }
 
+    public Command block() {
+        return run(() -> {});
+    }
+
     public void updateElevatorTelemetry() {
         SmartDashboard.putNumber("Elevator Height", getHeightInches());
         SmartDashboard.putNumber("Current Floor", getCurrentFloor());
         SmartDashboard.putBoolean("Homed?", isHomed());
         SmartDashboard.putBoolean("Bottom Limit", bottomLimitSwitch.get());
+        SmartDashboard.putNumber("Elevator Setpoint", elevatorPid.getSetpoint().position + 1);
     }
 
     @Override

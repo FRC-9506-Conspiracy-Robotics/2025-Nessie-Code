@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import javax.print.attribute.standard.PrinterIsAcceptingJobs;
+
+import com.ctre.phoenix.motorcontrol.can.BaseMotorControllerConfiguration;
+import com.ctre.phoenix6.configs.DigitalInputsConfigs;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -12,16 +16,33 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CanId;
 import frc.robot.Constants.EndEffectorConstants;
 
 public class ElbowSubsystem extends SubsystemBase{
     private final SparkMax elbowMotor = new SparkMax(CanId.elbowMotorCan, MotorType.kBrushless);
     private final RelativeEncoder elbowEncoder = elbowMotor.getEncoder();
-    private double targetAngleRad = 90 * Math.PI / 180.0;
+
+    private final DigitalInput bottomLimitSwitch = new DigitalInput(1);
+    private boolean homedStatus = false;
+    private boolean previousLimitVal = false;
+
+    private double targetAngle; //radians
+    private int currentStage = 0;
+    private final int bottomStage = 0;
+    private final int topStage = 2;
+    private final double[] stageAngles = {
+        EndEffectorConstants.fullyVertical,
+        EndEffectorConstants.intakeAngle,
+        EndEffectorConstants.fullyHorizontal
+    };
 
     private final ProfiledPIDController elbowPid =
         new ProfiledPIDController(
@@ -41,6 +62,8 @@ public class ElbowSubsystem extends SubsystemBase{
             EndEffectorConstants.kElbowkV
         );
     
+    Trigger bottomTrigger = new Trigger(() -> bottomLimitSwitch.get()).debounce(0.1);
+
     public ElbowSubsystem() {
         SparkMaxConfig config = new SparkMaxConfig();
         config.idleMode(IdleMode.kCoast)
@@ -52,81 +75,105 @@ public class ElbowSubsystem extends SubsystemBase{
     }
 
     public double getElbowAngleRad() {
-        return (elbowEncoder.getPosition() / EndEffectorConstants.kElbowGearing) * Math.PI * 2;
+        return (elbowEncoder.getPosition() / EndEffectorConstants.kElbowGearing) 
+        * Math.PI * 2;
     }
 
-    public double getElbowVelocityRadPerSec() {
-        return(elbowEncoder.getVelocity() / EndEffectorConstants.kElbowGearing) * Math.PI * 2 / 60;
-    }
-
-    public void setZero() {
-        System.out.println("Setting encoder position");
-        elbowEncoder.setPosition(0.25 * EndEffectorConstants.kElbowGearing);
-        //targetAngleRad = getElbowAngleRad();
-        System.out.println("New position " + getElbowAngleRad() * 180 / Math.PI);
-    }
-
-    public Command fixSetpoint() {
-        return runOnce(() -> {
-            elbowPid.reset(getElbowAngleRad());
-            targetAngleRad = getElbowAngleRad();
-        });
-    }
-
-    public Command resetZero() {
-        return runOnce(() -> setZero());
-    }
-
-    public void elbowGoToAngle(double angleRad) {
-        double voltsOut = MathUtil.clamp(
-            elbowPid.calculate(getElbowAngleRad(), angleRad)
-            + elbowFeed.calculateWithVelocities(
-                getElbowAngleRad(), elbowPid.getSetpoint().velocity, elbowPid.getSetpoint().velocity),
-            -12,
-            12
-        );
-        SmartDashboard.putNumber("Elbow target position", angleRad * 180 / Math.PI);
-        elbowMotor.setVoltage(voltsOut);
-    }
-
-    public Command setElbowAngle(double angleInRad) {
-        return runOnce(
-            () -> {
-                 targetAngleRad = angleInRad;
-            }
-        );
-    }
-
-    public void stop() {
+    public void handleBottomLimit() {
         elbowMotor.set(0.0);
+        elbowEncoder.setPosition(Units.radiansToRotations(EndEffectorConstants.fullyVertical) * EndEffectorConstants.kElbowGearing);
+        homedStatus = true;
+        targetAngle = EndEffectorConstants.fullyVertical;
+        currentStage = 0;
+        elbowPid.reset(EndEffectorConstants.fullyVertical);
+        System.out.println("Elbow homed");
     }
 
-    public Command stopElbow() {
-        return run(() -> stop());
+    public void handleOutOfBounds() {
+        homedStatus = false;
+        elbowMotor.set(0.0);
+        homeElbow();
     }
 
-    private double holdAngle = 0;
-    public Command holdElbow() {
-        return startRun(
-            () -> {
-                holdAngle = getElbowAngleRad();
-                elbowPid.reset(holdAngle);
-            },
-            () -> {
-                setElbowAngle(holdAngle);
-                System.out.println("Holding: " + holdAngle);
-                System.out.println("Position: " + getElbowAngleRad());
-            }
+    public void homeElbow() {
+        elbowMotor.set(0.1);
+        if (bottomLimitSwitch.get()) {
+            handleBottomLimit();
+        }
+    }
+
+    public boolean isHomed() {
+        return homedStatus;
+    }
+
+    public void setAngleRad(double rad) {
+        if (!homedStatus && rad > 0) {
+            System.out.println("WARNING: Elbow not homed");
+            System.out.println("Current elbow position: " + getElbowAngleRad());
+            System.out.println("Limit switch status " + bottomTrigger.getAsBoolean());
+            return;
+        }
+
+        targetAngle = MathUtil.clamp(rad, EndEffectorConstants.floorIntakeAngle, EndEffectorConstants.fullyVertical);
+    }
+
+    public Command goToCurrentStage() {
+        return runOnce(
+            () -> {setAngleRad(stageAngles[currentStage]);}
         );
     }
-    
-    public Command block() {
-        return run(() -> {elbowGoToAngle(targetAngleRad);});
+
+    public Command goToStage(int stage) {
+        return runOnce(() -> {currentStage = stage;});
+    }
+
+    public double getCurrentStage() {
+        return currentStage;
+    }
+
+    public Command goToBottom() {
+        return runOnce(() -> {setAngleRad(EndEffectorConstants.floorIntakeAngle);});
+    }
+
+    public boolean bottomLimitRising() {
+        boolean currentVal = bottomTrigger.getAsBoolean();
+        if (currentVal && !previousLimitVal) {
+            previousLimitVal = currentVal;
+            return true;
+        }
+        previousLimitVal = currentVal;
+        return false;
+    }
+
+    public void updateElbowTelemetry() {
+        SmartDashboard.putNumber("Elbow Angle", getElbowAngleRad());
+        SmartDashboard.putNumber("Current stage", getCurrentStage());
+        SmartDashboard.putBoolean("Elbow homed?", isHomed());
+        SmartDashboard.putBoolean("Elbow Bottom Limit", bottomLimitSwitch.get());
     }
     
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Elbow current position", getElbowAngleRad() * 180.0 / Math.PI);
-        elbowGoToAngle(targetAngleRad);
+        if (bottomLimitRising()) {
+            handleBottomLimit();
+        }
+
+        if ((getElbowAngleRad() > EndEffectorConstants.fullyVertical) || (getElbowAngleRad() <= EndEffectorConstants.fullyHorizontal)) {
+            handleOutOfBounds();
+        }
+
+        setAngleRad(stageAngles[currentStage]);
+        if (isHomed()) {
+            double voltsOut = MathUtil.clamp(
+                elbowPid.calculate(getElbowAngleRad(), targetAngle) +
+                elbowFeed.calculate(
+                    getElbowAngleRad(),
+                    elbowPid.getSetpoint().velocity
+                ),
+                -12, 12 
+            );
+            elbowMotor.setVoltage(voltsOut);
+        }
+        updateElbowTelemetry();
     }
 }

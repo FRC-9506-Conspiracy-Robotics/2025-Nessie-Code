@@ -157,7 +157,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     //command to set the target height to the current floor setpoint
     public Command goToCurrentFloor() {
         return runOnce(
-            () -> {setHeightInches(floorHeights[currentFloor]);});
+            () -> {setHeightInches(floorHeights[currentFloor]);}
+        );
     }
 
     //command to set the target height to the desired floor
@@ -192,7 +193,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Bottom Limit", bottomLimitSwitch.get());
     }
 
-    @Override
+    @Override 
     public void periodic() {
 
         //handle bottom limit if the limit switch is pressed

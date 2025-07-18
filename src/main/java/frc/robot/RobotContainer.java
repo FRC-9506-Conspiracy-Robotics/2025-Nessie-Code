@@ -72,11 +72,10 @@ public class RobotContainer {
     .allianceRelativeControl(true);
 
     public RobotContainer() {
-        NamedCommands.registerCommand("eject coral", this.claw.reverseIntake());
-        NamedCommands.registerCommand("set elbow to intake", this.elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
+        //NamedCommands.registerCommand("eject coral", this.claw.reverseIntake());
+        //NamedCommands.registerCommand("set elbow to intake", this.elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
 
         configureBindings();
-        elbow.resetZero();
         claw.resetZero();
 
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -102,19 +101,19 @@ public class RobotContainer {
         }
 
         mDriverController.y().onTrue(macros.configureForL4());
-        mDriverController.start().onTrue(elbow.resetZero().andThen(claw.resetZero())); 
+        mDriverController.start().onTrue(claw.resetZero()); 
         mDriverController.a().whileTrue(claw.runIntake());
         mDriverController.x().whileTrue(claw.reverseIntake());
 
         mDriverController.leftBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
         mDriverController.rightBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
-        mDriverController.povRight().onTrue(elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
-        mDriverController.povLeft().onTrue(elbow.setElbowAngle(EndEffectorConstants.restingAngle));
+        mDriverController.povRight().onTrue(elbow.goToStage(1));
+        mDriverController.povLeft().onTrue(elbow.goToStage(2));
         mDriverController.povUp().onTrue(elevator.incrementFloor());
         mDriverController.povDown().onTrue(elevator.decrementFloor());
 
         mDriverController.leftStick().onTrue(drivebase.zero());
-        mDriverController.rightStick().onTrue(elbow.fixSetpoint());
+        //mDriverController.rightStick().onTrue(elbow.fixSetpoint());
 
         mDriverController.rightTrigger(0.5).onTrue(macros.getIntoCoralReceiveConfig());
         mDriverController.b().toggleOnTrue(climber.deploy());

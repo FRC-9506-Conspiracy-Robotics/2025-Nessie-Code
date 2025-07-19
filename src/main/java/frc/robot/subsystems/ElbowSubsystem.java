@@ -36,6 +36,7 @@ public class ElbowSubsystem extends SubsystemBase{
 
     private double targetAngle; //radians
     private int currentStage = 0;
+    private double commandedPower = 0.0;
     private final int bottomStage = 0;
     private final int topStage = 2;
     private final double[] stageAngles = {
@@ -80,7 +81,7 @@ public class ElbowSubsystem extends SubsystemBase{
     }
 
     public void handleBottomLimit() {
-        elbowMotor.set(0.0);
+        commandedPower = 0.0;
         elbowEncoder.setPosition(Units.radiansToRotations(EndEffectorConstants.fullyVertical) * EndEffectorConstants.kElbowGearing);
         homedStatus = true;
         targetAngle = EndEffectorConstants.fullyVertical;
@@ -91,12 +92,12 @@ public class ElbowSubsystem extends SubsystemBase{
 
     public void handleOutOfBounds() {
         homedStatus = false;
-        elbowMotor.set(0.0);
+        commandedPower = 0.0;
         homeElbow();
     }
 
     public void homeElbow() {
-        elbowMotor.set(0.1);
+        commandedPower = 0.0;
         if (bottomLimitSwitch.get()) {
             handleBottomLimit();
         }
@@ -147,9 +148,13 @@ public class ElbowSubsystem extends SubsystemBase{
 
     public void updateElbowTelemetry() {
         SmartDashboard.putNumber("Elbow Angle", getElbowAngleRad());
+        SmartDashboard.putNumber("Elbow Target Angle", targetAngle);
+        SmartDashboard.putNumber("Elbow commanded power", commandedPower);
         SmartDashboard.putNumber("Current stage", getCurrentStage());
         SmartDashboard.putBoolean("Elbow homed?", isHomed());
         SmartDashboard.putBoolean("Elbow Bottom Limit", bottomLimitSwitch.get());
+        SmartDashboard.putNumber("elbow position setpoint", elbowPid.getSetpoint().position);
+        SmartDashboard.putNumber("elbow velocity setpoint", elbowPid.getSetpoint().velocity);
     }
     
     @Override
@@ -158,7 +163,7 @@ public class ElbowSubsystem extends SubsystemBase{
             handleBottomLimit();
         }
 
-        if ((getElbowAngleRad() > EndEffectorConstants.fullyVertical) || (getElbowAngleRad() <= EndEffectorConstants.fullyHorizontal)) {
+        if ((getElbowAngleRad() > EndEffectorConstants.fullyVertical) || (getElbowAngleRad() <= EndEffectorConstants.fullyHorizontal - (20.0 * Math.PI / 180.0))) {
             handleOutOfBounds();
         }
 
@@ -167,13 +172,16 @@ public class ElbowSubsystem extends SubsystemBase{
             double voltsOut = MathUtil.clamp(
                 elbowPid.calculate(getElbowAngleRad(), targetAngle) +
                 elbowFeed.calculate(
-                    getElbowAngleRad(),
+                    targetAngle,
                     elbowPid.getSetpoint().velocity
                 ),
                 -12, 12 
             );
-            elbowMotor.setVoltage(voltsOut);
+            commandedPower = voltsOut;
+        } else {
+            commandedPower = 1.2;
         }
+        elbowMotor.set(commandedPower / 12.0);
         updateElbowTelemetry();
     }
 }

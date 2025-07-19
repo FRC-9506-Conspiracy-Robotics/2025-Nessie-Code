@@ -73,8 +73,8 @@ public final class Constants {
         public static final double fullyVertical = Units.degreesToRadians(90);
         public static final double kElbowGearing = 125;
 
-        public static final double kMaxElbowVelocity = 10;
-        public static final double kMaxElbowAccel = 10;
+        public static final double kMaxElbowVelocity = 4.0;
+        public static final double kMaxElbowAccel = 2.5;
         public static final int kElbowCurrentLimit = 40;
         public static final double kElbowRampRate = 0.25;
         
@@ -83,9 +83,9 @@ public final class Constants {
         public static final double kElbowKd = 0;
         
         public static final double kElbowkS = 0.0;
-        public static final double kElbowkV = 0.1;
+        public static final double kElbowkV = 3.0;
         public static final double kElbowkA = 0.0;
-        public static final double kElbowkG = 0;
+        public static final double kElbowkG = 0.2;
 
         public static final double wristHorizontalAngle = 0 * Math.PI / 180.0;
         public static final double wristVerticalAngle = 90 * Math.PI / 180.0;

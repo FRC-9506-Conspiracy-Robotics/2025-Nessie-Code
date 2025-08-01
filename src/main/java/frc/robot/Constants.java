@@ -45,10 +45,10 @@ public final class Constants {
         public static final double l3Setpoint = 40;
         public static final double l4Setpoint = 55;
         public static final double intakeSetpoint = 12;
-        public static final double floorInakeSetpoint = 5;
+        public static final double floorInakeSetpoint = 5.75; 
         //pid constants
-        public static final double kElevatorKp = 0.2;
-        public static final double kElevatorKi = 0;
+        public static final double kElevatorKp = 1.0;
+        public static final double kElevatorKi = 0.0;
         public static final double kElevatorKd = 0.0;
         //feedforward constants
         public static final double kElevatorkS = 0.005;

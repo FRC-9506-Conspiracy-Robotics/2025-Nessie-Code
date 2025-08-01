@@ -191,7 +191,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Current Floor", getCurrentFloor());
         SmartDashboard.putBoolean("Homed?", isHomed());
         SmartDashboard.putBoolean("Bottom Limit", bottomLimitSwitch.get());
-        SmartDashboard.putNumber("elevator position setpoint", elevatorPid.getSetpoint().position + 1);
+        SmartDashboard.putNumber("elevator position setpoint", elevatorPid.getSetpoint().position);
     }
 
     @Override 

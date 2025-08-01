@@ -32,14 +32,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double targetPosition;
     private int currentFloor = 0;
     private final int bottomFloor = 0;
-    private final int topFloor = 4;
+    private final int topFloor = 5;
     private final double[] floorHeights = {
         ElevatorConstants.minExtension,
+        ElevatorConstants.floorInakeSetpoint,
         ElevatorConstants.intakeSetpoint, 
         ElevatorConstants.l2Setpoint, 
         ElevatorConstants.l3Setpoint, 
-        ElevatorConstants.l4Setpoint,
-        ElevatorConstants.intakeSetpoint
+        ElevatorConstants.l4Setpoint
     };
 
     //intitalize relative encoder based on the main motor
@@ -191,6 +191,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Current Floor", getCurrentFloor());
         SmartDashboard.putBoolean("Homed?", isHomed());
         SmartDashboard.putBoolean("Bottom Limit", bottomLimitSwitch.get());
+        SmartDashboard.putNumber("elevator position setpoint", elevatorPid.getSetpoint().position + 1);
     }
 
     @Override 

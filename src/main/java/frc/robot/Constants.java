@@ -36,31 +36,32 @@ public final class Constants {
 
     public static class ElevatorConstants {
         //motion constants
-        public static final double kElevatorGearing = 25;
+        public static final double kElevatorGearing = 5;
         public static final double kSprocketPitch = 1.76;
         //extension constants
         public static final double minExtension = 0;
-        public static final double maxExtension = 56;
+        public static final double maxExtension = 57;
         public static final double l2Setpoint = 24;
         public static final double l3Setpoint = 40;
         public static final double l4Setpoint = 55;
-        public static final double intakeSetpoint = 14;
+        public static final double intakeSetpoint = 12;
+        public static final double floorInakeSetpoint = 5;
         //pid constants
-        public static final double kElevatorKp = 0;
+        public static final double kElevatorKp = 0.2;
         public static final double kElevatorKi = 0;
         public static final double kElevatorKd = 0.0;
         //feedforward constants
-        public static final double kElevatorkS = 0.0;
-        public static final double kElevatorkV = 0.0;
+        public static final double kElevatorkS = 0.005;
+        public static final double kElevatorkV = 0.055;
         public static final double kElevatorkA = 0.0;
-        public static final double kElevatorkG = 0.0;
+        public static final double kElevatorkG = 0.65;
         //motion limits
         public static final double kMaxVelocity = 45;
         public static final double kMaxAccel = 170;
         public static final int kElevatorMaxCurrent = 40;
         public static final double kElevatorRampRate = 0.1;
         //other constraints
-        public static final double kElevatorTolerance = 1/16;
+        public static final double kElevatorTolerance = 1/100;
         public static final double kScoreDrop = 6;
     }
 
@@ -73,17 +74,17 @@ public final class Constants {
         public static final double fullyVertical = Units.degreesToRadians(90);
         public static final double kElbowGearing = 125;
 
-        public static final double kMaxElbowVelocity = 4.0;
+        public static final double kMaxElbowVelocity = 6.0;
         public static final double kMaxElbowAccel = 2.5;
         public static final int kElbowCurrentLimit = 40;
         public static final double kElbowRampRate = 0.25;
         
-        public static final double kElbowKp = 0;
-        public static final double kElbowKi = 0;
-        public static final double kElbowKd = 0;
+        public static final double kElbowKp = 2;
+        public static final double kElbowKi = 0.1;
+        public static final double kElbowKd = 0.3;
         
         public static final double kElbowkS = 0.0;
-        public static final double kElbowkV = 3.0;
+        public static final double kElbowkV = 2.5;
         public static final double kElbowkA = 0.0;
         public static final double kElbowkG = 0.2;
 

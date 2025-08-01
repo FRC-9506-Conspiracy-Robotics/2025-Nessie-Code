@@ -38,11 +38,12 @@ public class ElbowSubsystem extends SubsystemBase{
     private int currentStage = 0;
     private double commandedPower = 0.0;
     private final int bottomStage = 0;
-    private final int topStage = 2;
+    private final int topStage = 3;
     private final double[] stageAngles = {
         EndEffectorConstants.fullyVertical,
         EndEffectorConstants.intakeAngle,
-        EndEffectorConstants.fullyHorizontal
+        EndEffectorConstants.fullyHorizontal,
+        EndEffectorConstants.floorIntakeAngle
     };
 
     private final ProfiledPIDController elbowPid =
@@ -163,7 +164,7 @@ public class ElbowSubsystem extends SubsystemBase{
             handleBottomLimit();
         }
 
-        if ((getElbowAngleRad() > EndEffectorConstants.fullyVertical) || (getElbowAngleRad() <= EndEffectorConstants.fullyHorizontal - (20.0 * Math.PI / 180.0))) {
+        if ((getElbowAngleRad() > EndEffectorConstants.fullyVertical) || (getElbowAngleRad() <= EndEffectorConstants.floorIntakeAngle - (20.0 * Math.PI / 180.0))) {
             handleOutOfBounds();
         }
 

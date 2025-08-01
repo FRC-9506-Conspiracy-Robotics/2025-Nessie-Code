@@ -32,22 +32,23 @@ public class Macros {
         return this.elevator.goToFloor(1)
         .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
         .until(() -> {return claw.getWristAngleRad() < (5 * Math.PI / 180.0);})
-        .andThen(elbow.goToStage(1));
+        .andThen(elbow.goToStage(3));
     }
 
     public Command configureForL4() {
         return this.elbow.goToStage(1)
-        .andThen(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle))
+        .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
         .andThen(claw.block())
         .until(() -> {
-            return elbow.getElbowAngleRad() < (
-                EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
+            return elbow.getElbowAngleRad() >= (
+                EndEffectorConstants.intakeAngle - (5 * Math.PI / 180.0)
             );})
-        .andThen(elevator.goToFloor(4))
+        .andThen(elevator.goToFloor(5))
+        .andThen(claw.block())
         .until(() -> {
             return elevator.getHeightInches() > (ElevatorConstants.l4Setpoint - 3.0);
         })
-        .andThen(elbow.goToStage(0));
+        .andThen(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
     }
 
     public Command ejectCoral() {

@@ -31,7 +31,12 @@ public class Macros {
     public Command getIntoCoralReceiveConfig() {
         return this.elevator.goToFloor(1)
         .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
-        .until(() -> {return claw.getWristAngleRad() < (5 * Math.PI / 180.0);})
+        .andThen(claw.block())
+        .until(() -> {
+            return 
+                (claw.getWristAngleRad() < (5 * Math.PI / 180.0)) && 
+                (this.elevator.getHeightInches() < 6.0);
+        })
         .andThen(elbow.goToStage(3));
     }
 

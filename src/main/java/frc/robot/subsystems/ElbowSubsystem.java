@@ -148,13 +148,13 @@ public class ElbowSubsystem extends SubsystemBase{
     }
 
     public void updateElbowTelemetry() {
-        SmartDashboard.putNumber("Elbow Angle", getElbowAngleRad());
-        SmartDashboard.putNumber("Elbow Target Angle", targetAngle);
+        SmartDashboard.putNumber("Elbow Angle", getElbowAngleRad() * 180 / Math.PI);
+        SmartDashboard.putNumber("Elbow Target Angle", targetAngle * 180 / Math.PI);
         SmartDashboard.putNumber("Elbow commanded power", commandedPower);
         SmartDashboard.putNumber("Current stage", getCurrentStage());
         SmartDashboard.putBoolean("Elbow homed?", isHomed());
         SmartDashboard.putBoolean("Elbow Bottom Limit", bottomLimitSwitch.get());
-        SmartDashboard.putNumber("elbow position setpoint", elbowPid.getSetpoint().position);
+        SmartDashboard.putNumber("elbow position setpoint", elbowPid.getSetpoint().position * 180 / Math.PI);
         SmartDashboard.putNumber("elbow velocity setpoint", elbowPid.getSetpoint().velocity);
     }
     

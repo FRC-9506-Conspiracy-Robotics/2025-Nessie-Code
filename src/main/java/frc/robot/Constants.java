@@ -70,7 +70,7 @@ public final class Constants {
         public static final double kIntakeSpeed = 0.5;
         public static final double fullyHorizontal = Units.degreesToRadians(0);
         public static final double intakeAngle = Units.degreesToRadians(70);
-        public static final double floorIntakeAngle = Units.degreesToRadians(-45);
+        public static final double floorIntakeAngle = Units.degreesToRadians(-40);
         public static final double fullyVertical = Units.degreesToRadians(90);
         public static final double kElbowGearing = 125;
 

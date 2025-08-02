@@ -42,12 +42,12 @@ public final class Constants {
         public static final double minExtension = 0;
         public static final double maxExtension = 57;
         public static final double l2Setpoint = 24;
-        public static final double l3Setpoint = 40;
+        public static final double l3Setpoint = 27;
         public static final double l4Setpoint = 55;
         public static final double intakeSetpoint = 12;
-        public static final double floorInakeSetpoint = 5.75; 
+        public static final double floorInakeSetpoint = 6; 
         //pid constants
-        public static final double kElevatorKp = 1.0;
+        public static final double kElevatorKp = 0.5;
         public static final double kElevatorKi = 0.0;
         public static final double kElevatorKd = 0.0;
         //feedforward constants
@@ -68,9 +68,9 @@ public final class Constants {
     //measurements in degrees, where rotating up/counterclockwise is positive
     public static class EndEffectorConstants {
         public static final double kIntakeSpeed = 0.5;
-        public static final double fullyHorizontal = Units.degreesToRadians(0);
+        public static final double fullyHorizontal = Units.degreesToRadians(20);
         public static final double intakeAngle = Units.degreesToRadians(70);
-        public static final double floorIntakeAngle = Units.degreesToRadians(-40);
+        public static final double floorIntakeAngle = Units.degreesToRadians(-45);
         public static final double fullyVertical = Units.degreesToRadians(90);
         public static final double kElbowGearing = 125;
 
@@ -79,7 +79,7 @@ public final class Constants {
         public static final int kElbowCurrentLimit = 40;
         public static final double kElbowRampRate = 0.25;
         
-        public static final double kElbowKp = 2;
+        public static final double kElbowKp = 5;
         public static final double kElbowKi = 0.1;
         public static final double kElbowKd = 0.3;
         

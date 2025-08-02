@@ -28,7 +28,7 @@ public class Macros {
         this.claw = claw;
     }
 
-    public Command getIntoCoralReceiveConfig() {
+    public Command getIntoFloorIntakeConfig() {
         return this.elevator.goToFloor(1)
         .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
         .andThen(claw.block())
@@ -40,6 +40,18 @@ public class Macros {
         .andThen(elbow.goToStage(3));
     }
 
+    public Command getIntoCoralReceiveConfig() {
+        return this.elevator.goToFloor(2)
+        .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
+        .andThen(claw.block())
+        .until(() -> {
+            return 
+                (claw.getWristAngleRad() < (5 * Math.PI / 180.0)) && 
+                (this.elevator.getHeightInches() < 6.5);
+        })
+        .andThen(elbow.goToStage(1));
+    }
+
     public Command configureForL4() {
         return this.elbow.goToStage(1)
         .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
@@ -48,7 +60,7 @@ public class Macros {
             return elbow.getElbowAngleRad() >= (
                 EndEffectorConstants.intakeAngle - (5 * Math.PI / 180.0)
             );})
-        .andThen(elevator.goToFloor(5))
+        .andThen(elevator.goToFloor(4))
         .andThen(claw.block())
         .until(() -> {
             return elevator.getHeightInches() > (ElevatorConstants.l4Setpoint - 3.0);
@@ -56,13 +68,15 @@ public class Macros {
         .andThen(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
     }
 
-    public Command ejectCoral() {
+    public Command l1eject() {
         return this.elbow.goToStage(1)
+            .andThen(claw.block())
             .until(() -> {
                 return elbow.getElbowAngleRad() < (
                     EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
                 );
             })
-            .andThen(claw.reverseIntake());
+            .andThen(claw.reverseIntake()
+            .withTimeout(2.0));
     }
 }

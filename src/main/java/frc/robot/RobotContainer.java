@@ -75,11 +75,13 @@ public class RobotContainer {
         //NamedCommands.registerCommand("eject coral", this.claw.reverseIntake());
         //NamedCommands.registerCommand("set elbow to intake", this.elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
 
+        NamedCommands.registerCommand("l1 eject", macros.l1eject());
+
         configureBindings();
         claw.resetZero();
 
         autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("auto chooser", autoChooser);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private double getSpeedModifier() {
@@ -101,23 +103,25 @@ public class RobotContainer {
         }
 
         mDriverController.y().onTrue(macros.configureForL4());
-        mDriverController.start().onTrue(claw.resetZero()); 
-        mDriverController.a().whileTrue(claw.runIntake());
+        mDriverController.start().onTrue(macros.getIntoCoralReceiveConfig()); 
+        mDriverController.rightBumper().whileTrue(claw.runIntake());
         mDriverController.x().whileTrue(claw.reverseIntake());
 
+
         mDriverController.leftBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
-        mDriverController.rightBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
+        mDriverController.a().onTrue(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
         mDriverController.povRight().onTrue(elbow.goToStage(1));
         mDriverController.povLeft().onTrue(elbow.goToStage(2));
         mDriverController.povUp().onTrue(elevator.incrementFloor());
         mDriverController.povDown().onTrue(elevator.decrementFloor());
 
         mDriverController.leftStick().onTrue(drivebase.zero());
+        mDriverController.back().onTrue(elbow.zeroElbow());
         //mDriverController.rightStick().onTrue(elbow.fixSetpoint());
 
-        mDriverController.rightTrigger(0.5).onTrue(macros.getIntoCoralReceiveConfig());
-        mDriverController.b().toggleOnTrue(climber.deploy());
-        mDriverController.leftTrigger(0.5).toggleOnTrue(climber.climb());
+        mDriverController.rightTrigger(0.5).onTrue(macros.getIntoFloorIntakeConfig());
+        mDriverController.b().whileTrue(climber.deploy());
+        mDriverController.leftTrigger(0.5).whileTrue(climber.climb());
     }
 
     public Command resetDriveTimer() {

@@ -97,6 +97,10 @@ public class ElbowSubsystem extends SubsystemBase{
         homeElbow();
     }
 
+    public Command zeroElbow() {
+        return runOnce(() -> {handleOutOfBounds();});
+    }
+    
     public void homeElbow() {
         commandedPower = 0.0;
         if (bottomLimitSwitch.get()) {

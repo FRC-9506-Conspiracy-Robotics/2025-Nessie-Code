@@ -14,31 +14,26 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriverConstants;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.EndEffectorConstants;
-import frc.robot.subsystems.ClawSubsystem;
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.ElbowSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.commands.Macros;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.PivotSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+
+// make macros ig
 
 public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
     final CommandXboxController mDriverController = new CommandXboxController(DriverConstants.kDriverControllerPort);
 
     private final Timer driveTimer = new Timer();
-    private final Climber climber = new Climber();
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-    private final ElevatorSubsystem elevator = new ElevatorSubsystem();
-    public final ElbowSubsystem elbow = new ElbowSubsystem();
-    public final ClawSubsystem claw = new ClawSubsystem();
+    private final PivotSubsystem pivot = new PivotSubsystem();
+    private final ShooterSubsystem shooter = new ShooterSubsystem();
     private final Macros macros = new Macros(
-        elevator,
-        claw,
-        elbow
+        pivot,
+        shooter
     );
 
     //converts controller inputs to swerveinputstream type for field oriented
@@ -72,56 +67,32 @@ public class RobotContainer {
     .allianceRelativeControl(true);
 
     public RobotContainer() {
-        //NamedCommands.registerCommand("eject coral", this.claw.reverseIntake());
-        //NamedCommands.registerCommand("set elbow to intake", this.elbow.setElbowAngle(EndEffectorConstants.intakeAngle));
-
-        NamedCommands.registerCommand("l1 eject", macros.l1eject());
-
         configureBindings();
-        claw.resetZero();
+
+        mDriverController.leftTrigger().whileTrue(macros.intakeMacro());
+        mDriverController.rightTrigger().whileTrue(macros.shootMacro());
+
+        mDriverController.leftStick().onTrue(drivebase.zero());
+        
+        NamedCommands.registerCommand("shoot", macros.shootMacro().withTimeout(1.5));
+        NamedCommands.registerCommand("intake", macros.intakeMacro().withTimeout(2.0));
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     private double getSpeedModifier() {
-        if (elevator.getHeightInches() > (ElevatorConstants.intakeSetpoint)) {
-            double slope = (0.25 - 1.0) / (ElevatorConstants.l4Setpoint - ElevatorConstants.intakeSetpoint);
-            double intercept = 1.0 - slope * ElevatorConstants.intakeSetpoint;
-            return slope * elevator.getHeightInches() + intercept;
-        }
         return 1.0;
     }
 
     private void configureBindings() {
         Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-        Command driveFieldOrientedAngularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocity);
+        Command driveFieldOrientedAngularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
         if (RobotBase.isSimulation()) {
             drivebase.setDefaultCommand(driveFieldOrientedAngularVelocityKeyboard);
         } else {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
         }
-
-        mDriverController.y().onTrue(macros.configureForL4());
-        mDriverController.start().onTrue(macros.getIntoCoralReceiveConfig()); 
-        mDriverController.rightBumper().whileTrue(claw.runIntake());
-        mDriverController.x().whileTrue(claw.reverseIntake());
-
-
-        mDriverController.leftBumper().onTrue(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle));
-        mDriverController.a().onTrue(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
-        mDriverController.povRight().onTrue(elbow.goToStage(1));
-        mDriverController.povLeft().onTrue(elbow.goToStage(2));
-        mDriverController.povUp().onTrue(elevator.incrementFloor());
-        mDriverController.povDown().onTrue(elevator.decrementFloor());
-
-        mDriverController.leftStick().onTrue(drivebase.zero());
-        mDriverController.back().onTrue(elbow.zeroElbow());
-        //mDriverController.rightStick().onTrue(elbow.fixSetpoint());
-
-        mDriverController.rightTrigger(0.5).onTrue(macros.getIntoFloorIntakeConfig());
-        mDriverController.b().whileTrue(climber.deploy());
-        mDriverController.leftTrigger(0.5).whileTrue(climber.climb());
     }
 
     public Command resetDriveTimer() {

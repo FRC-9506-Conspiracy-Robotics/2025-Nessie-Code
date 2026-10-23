@@ -1,82 +1,36 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.EndEffectorConstants;
-import frc.robot.subsystems.ClawSubsystem;
-import frc.robot.subsystems.ElbowSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.PivotSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+
+import frc.robot.Constants.ShooterConstants;
 
 public class Macros {
-    // This sequence is responsible for ensuring the following goals:
-    // 1. Get the elevator into coral station height
-    // 2. Set elbow down
-    // 3. Turn wrist to horizontal
-    // 4. Run intake motors.
+    private final PivotSubsystem pivot;
+    private final ShooterSubsystem shooter;
 
-    private final ElevatorSubsystem elevator;
-    private final ClawSubsystem claw;
-    private final ElbowSubsystem elbow;
-
-    public Macros( 
-        ElevatorSubsystem elevator, 
-        ClawSubsystem claw, 
-        ElbowSubsystem elbow
+    public Macros(
+        PivotSubsystem pivot,
+        ShooterSubsystem shooter
     ) {
-        this.elevator = elevator;
-        this.elbow = elbow;
-        this.claw = claw;
+        this.pivot = pivot;
+        this.shooter = shooter;
     }
 
-    public Command getIntoFloorIntakeConfig() {
-        return this.elevator.goToFloor(1)
-        .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
-        .andThen(claw.block())
-        .until(() -> {
-            return 
-                (claw.getWristAngleRad() < (5 * Math.PI / 180.0)) && 
-                (this.elevator.getHeightInches() < 6.0);
-        })
-        .andThen(elbow.goToStage(3));
+    public Command shootMacro() {
+        return pivot.setPivotPositionCommand(true)
+            .andThen(shooter.setShooterSpeedCommand(ShooterConstants.shootRpm))
+            .withName("ShootMacro");
     }
 
-    public Command getIntoCoralReceiveConfig() {
-        return this.elevator.goToFloor(2)
-        .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
-        .andThen(claw.block())
-        .until(() -> {
-            return 
-                (claw.getWristAngleRad() < (5 * Math.PI / 180.0)) && 
-                (this.elevator.getHeightInches() < 6.5);
-        })
-        .andThen(elbow.goToStage(1));
-    }
-
-    public Command configureForL4() {
-        return this.elbow.goToStage(1)
-        .andThen(claw.setWristAngle(EndEffectorConstants.wristHorizontalAngle))
-        .andThen(claw.block())
-        .until(() -> {
-            return elbow.getElbowAngleRad() >= (
-                EndEffectorConstants.intakeAngle - (5 * Math.PI / 180.0)
-            );})
-        .andThen(elevator.goToFloor(4))
-        .andThen(claw.block())
-        .until(() -> {
-            return elevator.getHeightInches() > (ElevatorConstants.l4Setpoint - 3.0);
-        })
-        .andThen(claw.setWristAngle(EndEffectorConstants.wristVerticalAngle));
-    }
-
-    public Command l1eject() {
-        return this.elbow.goToStage(1)
-            .andThen(claw.block())
-            .until(() -> {
-                return elbow.getElbowAngleRad() < (
-                    EndEffectorConstants.intakeAngle + (5 * Math.PI / 180.0)
-                );
-            })
-            .andThen(claw.reverseIntake()
-            .withTimeout(2.0));
+    public Command intakeMacro() {
+        return Commands.parallel(
+                shooter.setShooterSpeedCommand(ShooterConstants.intakeRpm),
+                pivot.setPivotPositionCommand(false)
+            )
+            .withName("IntakeMacro");
     }
 }
